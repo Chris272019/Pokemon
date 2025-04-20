@@ -1,0 +1,190 @@
+/* Battle Results specific styles */
+.battle-results-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.battle-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.battle-results-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.battle-results-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 768px) {
+  .battle-results-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.battle-list {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.battle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.battle-item:last-child {
+  border-bottom: none;
+}
+
+.battle-item:hover {
+  background-color: #f5f5f5;
+}
+
+.battle-win {
+  border-left: 4px solid #4caf50;
+}
+
+.battle-loss {
+  border-left: 4px solid #f44336;
+}
+
+.battle-draw {
+  border-left: 4px solid #ff9800;
+}
+
+.battle-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.battle-date {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.battle-opponent {
+  font-weight: bold;
+}
+
+.battle-result-text {
+  font-weight: bold;
+}
+
+.battle-win .battle-result-text {
+  color: #4caf50;
+}
+
+.battle-loss .battle-result-text {
+  color: #f44336;
+}
+
+.battle-draw .battle-result-text {
+  color: #ff9800;
+}
+
+.battle-details {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.battle-details h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.detail-section h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: #3b4cca;
+}
+
+.team-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.pokemon-preview {
+  text-align: center;
+}
+
+.pokemon-preview img {
+  width: 50px;
+  height: 50px;
+}
+
+.pokemon-preview span {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.close-details-button {
+  background-color: #3b4cca;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.close-details-button:hover {
+  background-color: #2a3b9d;
+}
+
+.empty-battles {
+  text-align: center;
+  padding: 3rem;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.empty-battles h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.empty-battles p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.start-battle-button {
+  display: inline-block;
+  background-color: #3b4cca;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.start-battle-button:hover {
+  background-color: #2a3b9d;
+}
