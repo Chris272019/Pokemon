@@ -21,6 +21,7 @@ const PokemonBattle = () => {
   const [selectedDeck, setSelectedDeck] = useState(null)
   const [defeatedPokemon, setDefeatedPokemon] = useState({ player: [], opponent: [] })
 
+
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -273,6 +274,7 @@ const PokemonBattle = () => {
                   className={`pokemon-battle-card ${selectedPokemon?.id === pokemon.id ? "selected" : ""} ${winningTeam === "player" ? "winner" : ""} ${defeatedPokemon.player.includes(pokemon.id) ? "defeated" : ""}`}
                   onClick={() => !defeatedPokemon.player.includes(pokemon.id) && selectPokemon(pokemon)}
                 >
+                  <div className="pokemon-name">{pokemon.name}</div>
                   <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
                   <div className="pokemon-stats">
                     <div className="stat-bar">
@@ -286,15 +288,29 @@ const PokemonBattle = () => {
           </div>
 
           <div className="battle-log-container">
-            <h3>Battle Log</h3>
-            <div className="battle-log">
-              {battleLog.map((log, index) => (
-                <div key={index} className="log-entry">
-                  {log}
-                </div>
-              ))}
-            </div>
-          </div>
+  <h3>Battle Log</h3>
+  <div className="battle-log">
+    {battleLog.map((log, index) => (
+      <div 
+        key={index} 
+        className={`log-entry 
+          ${log.toLowerCase().includes('winner') ? 'log-winner' : ''}
+          ${log.toLowerCase().includes('hp') ? 'log-hp' : ''}
+          ${log.toLowerCase().includes('attack') ? 'log-attack' : ''}
+          ${log.toLowerCase().includes('defense') ? 'log-defense' : ''}
+          ${log.toLowerCase().includes('special attack') ? 'log-special-attack' : ''}
+          ${log.toLowerCase().includes('special defense') ? 'log-special-defense' : ''}
+          ${log.toLowerCase().includes('speed') ? 'log-speed' : ''}
+        `}
+      >
+        {log}
+      </div>
+    ))}
+  </div>
+</div>
+
+
+          
 
           <div className={`team-section opponent-team ${winningTeam === "opponent" ? "winner" : ""}`}>
             <h3>Opponent's Team</h3>
@@ -305,6 +321,7 @@ const PokemonBattle = () => {
                   className={`pokemon-battle-card ${selectedOpponent?.id === pokemon.id ? "selected" : ""} ${winningTeam === "opponent" ? "winner" : ""} ${defeatedPokemon.opponent.includes(pokemon.id) ? "defeated" : ""}`}
                   onClick={() => !defeatedPokemon.opponent.includes(pokemon.id) && selectOpponent(pokemon)}
                 >
+                  <div className="pokemon-name">{pokemon.name}</div>
                   <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
                   <div className="pokemon-stats">
                     <div className="stat-bar">
@@ -321,8 +338,8 @@ const PokemonBattle = () => {
         {!winner && (
           <div className="battle-controls">
             <div className="selection-status">
-              {!selectedPokemon && <p>Select your Pokémon</p>}
-              {!selectedOpponent && <p>Select opponent's Pokémon</p>}
+              {!selectedPokemon && <p>Select Your Pokémon</p>}
+              {!selectedOpponent && <p>Select Opponent's Pokémon</p>}
             </div>
             <button
               className="show-winner-button"

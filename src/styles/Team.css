@@ -4,12 +4,15 @@
   margin: 0 auto;
   padding: 2rem;
 }
+.pokedex-container{
+  margin-top: 4rem;
+}
 
 .team-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* optional spacing */
 }
 
 .team-title {

@@ -43,7 +43,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(135deg, #FF0000, #3466AF);
   color: white;
   backdrop-filter: blur(10px);
   box-shadow: var(--box-shadow);
@@ -79,6 +79,54 @@ body {
 
 .navbar-links a:hover {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Hamburger button */
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .navbar-links {
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    flex-direction: column;
+    gap: 1rem;
+    background: #3466AF;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1rem;
+    display: none;
+    animation: slideDown 0.3s ease forwards;
+  }
+
+  .navbar-links.active {
+    display: flex;
+  }
+}
+
+/* Optional animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .main-content {
@@ -134,7 +182,7 @@ a[href^="#"] {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 2px solid red;
 }
 
 .pokemon-card:hover {
@@ -295,6 +343,7 @@ a[href^="#"] {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
   max-width: 1200px;
+  margin-top: 4rem;
   backdrop-filter: blur(10px);
 }
 
@@ -779,6 +828,7 @@ a[href^="#"] {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 3rem;
   margin-bottom: 2rem;
 }
 
@@ -854,12 +904,15 @@ a[href^="#"] {
 .deck-element {
   font-size: 0.875rem;
   color: #64748b;
+  padding: 10px;
+  border-radius: 4px;
 }
 
 .deck-pokemon-preview {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
+  margin-left: 1rem;
   margin-top: 1rem;
 }
 
@@ -940,6 +993,7 @@ a[href^="#"] {
   background: white;
   border-radius: var(--border-radius);
   padding: 2rem;
+  margin-top: 4rem;
   box-shadow: var(--box-shadow);
 }
 
@@ -975,11 +1029,27 @@ a[href^="#"] {
 }
 
 .deck-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 2rem;
+
 }
+.deck-pokemon{
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: nowrap; /* or wrap, if you want them to go to the next line on small screens */
+    overflow-x: auto;   /* enables horizontal scroll if they overflow */
+    justify-content: center; /* <-- centers the items horizontally */
+    align-items: center;
+  
+  }
+  .deck-card{
+    border: 2px solid red;
+  }
+
 
 .start-battle-button {
   display: block;
@@ -1047,22 +1117,166 @@ a[href^="#"] {
   object-fit: contain;
 }
 
-.battle-log {
-  background: #f8fafc;
-  border-radius: var(--border-radius);
+/* General Styles */
+.battle-log-container {
   padding: 1.5rem;
+  background: linear-gradient(135deg, #f1f5f9, #ffffff);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.battle-log {
+  background-color: #f8fafc;
+  border-radius: 12px;
+  padding: 1.25rem;
   max-height: 300px;
   overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .log-entry {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
   font-size: 0.875rem;
+  border-radius: 8px;
+  line-height: 1.6;
+  position: relative;
+  background-color: #e2e8f0;
+  color: #1e293b;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.log-entry:hover {
+  transform: translateY(-2px);
+  background-color: #b2b2b4;
 }
 
 .log-entry:last-child {
-  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.log-entry::before {
+  content: "▶ ";
+  color: #4a5568;
+  margin-right: 0.75rem;
+}
+
+
+
+/* WINNER Log Style */
+.log-winner {
+  color: #34d399;  /* Bright gold/orange for winner */
+  font-weight: bold;
+  background-color: #111827;  /* Dark background to make the text pop */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.log-winner:hover{
+  transform: translateY(-2px);
+  background-color: #59595f;
+}
+
+/* Stats Color Classes */
+.log-hp {
+  color: #ef4444;  /* Red for HP */
+  font-weight: bold;
+}
+
+.log-attack {
+  color: #f97316;  /* Orange for Attack */
+  font-weight: bold;
+}
+
+.log-defense {
+  color: #0c533b;  /* Green for Defense */
+  font-weight: bold;
+}
+
+.log-special-attack {
+  color: #3b82f6;  /* Blue for Special Attack */
+  font-weight: bold;
+}
+
+.log-special-defense {
+  color: #8b5cf6;  /* Purple for Special Defense */
+  font-weight: bold;
+}
+.log-speed {
+  color: #fbbf24;  /* Yellow for Speed */
+  font-weight: bold;
+}
+
+/* Selection Status */
+.selection-status {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f0f4f8;  /* Light background color */
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.selection-status p {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0.5rem 0;
+}
+
+/* Highlight message when no selection is made */
+.selection-status p {
+  color: #f87171;  /* Red for warning */
+}
+
+/* Show Pokémon selected message */
+.selection-status p:has(+ p) {
+  color: #34d399;  /* Green for success when both are selected */
+}
+
+/* Show button */
+.show-winner-button {
+  background-color: #3b82f6;  /* Blue color for the button */
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 50px;  /* Rounded button */
+  font-size: 1.125rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: block;
+  margin: 1rem auto;
+  width: max-content;
+}
+
+/* Button Hover Effects */
+.show-winner-button:hover {
+  background-color: #2563eb;  /* Darker blue on hover */
+  transform: translateY(-2px); /* Subtle lift effect */
+}
+
+/* Disabled Button Styles */
+.show-winner-button:disabled {
+  background-color: #d1d5db;  /* Light grey */
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .battle-result {
@@ -1230,11 +1444,12 @@ a[href^="#"] {
 }
 
 .hero-section {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(150deg,#FF0000, #807c7c,#3466AF);
   border-radius: var(--border-radius);
   padding: 4rem 2rem;
   text-align: center;
   color: white;
+  margin-top: 2rem;
   margin-bottom: 4rem;
   position: relative;
   overflow: hidden;
