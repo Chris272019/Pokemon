@@ -639,57 +639,79 @@ a[href^="#"] {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background-color: white;
+  background: white;
   padding: 2rem;
   border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
   max-width: 500px;
   width: 90%;
+  box-shadow: var(--box-shadow);
 }
 
 .modal-content h3 {
+  color: #ef4444;
   margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
-.deck-name-input,
-.deck-element-select {
-  width: 100%;
-  padding: 0.75rem;
+.modal-content p {
   margin-bottom: 1rem;
-  border: 1px solid #ddd;
-  border-radius: var(--border-radius);
-  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.modal-content ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: var(--text-color);
+}
+
+.modal-content li {
+  margin-bottom: 0.5rem;
 }
 
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+}
+
+.confirm-button,
+.cancel-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
 .confirm-button {
-  background-color: #4caf50;
+  background-color: #ef4444;
+  color: white;
 }
 
 .confirm-button:hover {
-  background-color: #388e3c;
+  background-color: #dc2626;
+  transform: translateY(-2px);
 }
 
 .cancel-button {
-  background-color: #e74c3c;
+  background-color: #e5e7eb;
+  color: #374151;
 }
 
 .cancel-button:hover {
-  background-color: #c0392b;
+  background-color: #d1d5db;
+  transform: translateY(-2px);
 }
 
 .pokemon-preview {
@@ -1506,6 +1528,17 @@ h3 {
 .hero-button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+}
+
+.hero-button.reset-button {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: white;
+}
+
+.hero-button.reset-button:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
 }
 
 .stats-section {

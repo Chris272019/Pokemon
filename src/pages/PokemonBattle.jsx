@@ -90,10 +90,9 @@ const PokemonBattle = () => {
 
   const selectPokemon = (pokemon) => {
     setSelectedPokemon(pokemon)
-  }
-
-  const selectOpponent = (pokemon) => {
-    setSelectedOpponent(pokemon)
+    // Automatically select opponent's Pokemon
+    const opponent = aiSelectPokemon()
+    setSelectedOpponent(opponent)
   }
 
   // Calculate damage based on Attack vs HP
@@ -128,12 +127,9 @@ const PokemonBattle = () => {
     const availablePokemon = opponentTeam.filter(p => !defeatedPokemon.opponent.includes(p.id))
     if (availablePokemon.length === 0) return null
 
-    // Simple strategy: Choose Pokemon with highest Attack stat
-    return availablePokemon.reduce((best, current) => {
-      const currentAttack = current.stats.find(stat => stat.stat.name === "attack").base_stat
-      const bestAttack = best.stats.find(stat => stat.stat.name === "attack").base_stat
-      return currentAttack > bestAttack ? current : best
-    }, availablePokemon[0])
+    // Randomly select a Pokemon from available ones
+    const randomIndex = Math.floor(Math.random() * availablePokemon.length)
+    return availablePokemon[randomIndex]
   }
 
   const showWinner = () => {
@@ -344,7 +340,9 @@ const PokemonBattle = () => {
               <div className="battle-controls">
                 <div className="selection-status">
                   {!selectedPokemon && <p>Select Your Pokémon</p>}
-                  {!selectedOpponent && <p>Select Opponent's Pokémon</p>}
+                  {selectedPokemon && selectedOpponent && (
+                    <p>Ready to battle! {selectedPokemon.name} VS {selectedOpponent.name}</p>
+                  )}
                 </div>
                 <button
                   className="show-winner-button"
@@ -380,7 +378,6 @@ const PokemonBattle = () => {
                   <div
                     key={pokemon.id}
                     className={`pokemon-battle-card ${selectedOpponent?.id === pokemon.id ? "selected" : ""} ${winningTeam === "opponent" ? "winner" : ""} ${defeatedPokemon.opponent.includes(pokemon.id) ? "defeated" : ""}`}
-                    onClick={() => !defeatedPokemon.opponent.includes(pokemon.id) && selectOpponent(pokemon)}
                   >
                     <div className="pokemon-name">{pokemon.name}</div>
                     <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
