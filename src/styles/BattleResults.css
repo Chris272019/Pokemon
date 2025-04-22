@@ -154,101 +154,111 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border-radius: 1rem;
+  background: #ffffff;
+  border-radius: 0;
   padding: 2rem;
   width: 95%;
-  max-width: 1200px;
+  max-width: 400px;
   max-height: 90vh;
   overflow-y: auto;
   z-index: 11;
-  color: white;
-  display: grid;
-  grid-template-columns: 300px 1fr;
+  color: #333;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .battle-details h3 {
   margin: 0;
-  font-size: 1.5rem;
-  color: #ffffff;
-  grid-column: span 2;
-}
-
-.battle-details .detail-section:first-of-type {
-  grid-column: span 2;
+  font-size: 1.25rem;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
 }
 
 .detail-section {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .detail-section h4 {
-  margin: 0 0 1rem 0;
-  color: #94a3b8;
+  margin: 0;
+  color: #333;
   font-size: 1rem;
+  font-weight: normal;
 }
 
-.battle-pokemon {
+.timestamp {
+  color: #666;
+  margin: 0;
+}
+
+.teams-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 2rem;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.team-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.team-section h5 {
+  color: #333;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.pokemon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .pokemon-card {
-  text-align: center;
-  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #ff0000;
+  border-radius: 4px;
+  width: 100%;
+  min-height: 100px;
 }
 
 .pokemon-card img {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
-  margin-bottom: 0.5rem;
 }
 
 .pokemon-card p {
   margin: 0;
-  color: white;
-  font-weight: bold;
-  text-transform: capitalize;
+  color: #333;
+  font-weight: normal;
+  text-transform: lowercase;
   font-size: 0.875rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.vs {
-  color: #94a3b8;
-  font-weight: bold;
-  font-size: 1.25rem;
+.close-button {
+  align-self: center;
+  margin-top: 1rem;
 }
 
 @media (max-width: 640px) {
-  .pokedex-container {
-    padding: 1rem;
-  }
-
-  .battle-list {
-    grid-template-columns: 1fr;
-  }
-
   .battle-details {
-    width: 95%;
-    padding: 1.5rem;
-  }
-
-  .battle-pokemon {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .vs {
-    transform: rotate(90deg);
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    border-radius: 0;
   }
 }
 
@@ -270,33 +280,6 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
-}
-
-.teams-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 100%;
-}
-
-.team-section {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  flex: 1;
-}
-
-.team-section h5 {
-  color: #94a3b8;
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-}
-
-.pokemon-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  justify-items: center;
 }
 
 .rounds-container {
@@ -393,10 +376,6 @@
   .teams-container {
     flex-direction: row;
     gap: 1rem;
-  }
-
-  .pokemon-list {
-    grid-template-columns: repeat(1, 1fr);
   }
 }
 

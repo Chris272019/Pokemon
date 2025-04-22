@@ -146,10 +146,10 @@ const BattleResults = () => {
               <>
                 <div className="battle-details-overlay" onClick={() => setSelectedBattle(null)} />
                 <div className="battle-details">
-                  <h3>Battle Details</h3>
+                  <h3>BATTLE DETAILS</h3>
                   <div className="detail-section">
                     <h4>Date & Time</h4>
-                    <p>{formatDate(selectedBattle.date)}</p>
+                    <p className="timestamp">{formatDate(selectedBattle.date)}</p>
                   </div>
                   {selectedBattle.yourTeam && selectedBattle.opponentTeam && (
                     <div className="detail-section">
@@ -186,61 +186,7 @@ const BattleResults = () => {
                       </div>
                     </div>
                   )}
-                  {selectedBattle.rounds && (
-                    <div className="detail-section">
-                      <h4>Battle Rounds</h4>
-                      <div className="rounds-container">
-                        {selectedBattle.rounds.map((round, index) => (
-                          <div key={index} className="round-card">
-                            <h5>Round {index + 1}</h5>
-                            <div className="round-pokemon">
-                              <div className="pokemon-card">
-                                <img
-                                  src={round.playerPokemon?.sprites?.front_default || "/placeholder.svg"}
-                                  alt={round.playerPokemon?.name}
-                                />
-                                <p>{round.playerPokemon?.name}</p>
-                                {round.playerPokemon?.stats && (
-                                  <span className="hp-bar">
-                                    HP: {round.playerPokemon.currentHP}/{round.playerPokemon.stats.hp}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="vs">VS</div>
-                              <div className="pokemon-card">
-                                <img
-                                  src={round.opponentPokemon?.sprites?.front_default || "/placeholder.svg"}
-                                  alt={round.opponentPokemon?.name}
-                                />
-                                <p>{round.opponentPokemon?.name}</p>
-                                {round.opponentPokemon?.stats && (
-                                  <span className="hp-bar">
-                                    HP: {round.opponentPokemon.currentHP}/{round.opponentPokemon.stats.hp}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="round-result">
-                              Winner: {round.winner === 'player' ? 'You' : 'Opponent'}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="detail-section">
-                    <h4>Final Result</h4>
-                    <div className={`battle-result ${getBattleResultClass(selectedBattle.result)}`}>
-                      {selectedBattle.result.toUpperCase()}
-                    </div>
-                    {selectedBattle.totalWins && (
-                      <div className="battle-score">
-                        <p>Your Score: {selectedBattle.totalWins.player}</p>
-                        <p>Opponent Score: {selectedBattle.totalWins.opponent}</p>
-                      </div>
-                    )}
-                  </div>
-                  <button className="pokedex-button" onClick={() => setSelectedBattle(null)}>
+                  <button className="pokedex-button close-button" onClick={() => setSelectedBattle(null)}>
                     Close Details
                   </button>
                 </div>
