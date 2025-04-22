@@ -10,13 +10,14 @@ const Home = () => {
   const [deckCount, setDeckCount] = useState(0)
   const [userName, setUserName] = useState("")
   const [error, setError] = useState("")
+  const [showResetConfirm, setShowResetConfirm] = useState(false)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const [teamRes, battleRes, deckRes] = await Promise.all([
           axios.get("http://localhost:3001/teams"),
-          axios.get("http://localhost:3001/battleHistory"),
+          axios.get("http://localhost:3001/battles"),
           axios.get("http://localhost:3001/decks"),
         ])
 
@@ -38,12 +39,84 @@ const Home = () => {
       return
     }
     try {
-      // Save the user name to localStorage
       localStorage.setItem("pokemonUserName", userName)
       setError("")
-      // You can add additional logic here, like updating a user profile
     } catch (error) {
       setError("Error saving name. Please try again.")
+    }
+  }
+
+  const handleResetAllData = async () => {
+    try {
+      // First, get all the data
+      const [teams, battles, decks] = await Promise.all([
+        axios.get("http://localhost:3001/teams"),
+        axios.get("http://localhost:3001/battles"),
+        axios.get("http://localhost:3001/decks")
+      ]);
+
+      // Delete in sequence to avoid potential foreign key conflicts
+      // First delete battles as they might reference teams or decks
+      if (battles.data.length > 0) {
+        await Promise.all(
+          battles.data.map(battle => 
+            axios.delete(`http://localhost:3001/battles/${battle.id}`)
+            .catch(err => console.error(`Failed to delete battle ${battle.id}:`, err))
+          )
+        );
+      }
+
+      // Then delete teams
+      if (teams.data.length > 0) {
+        await Promise.all(
+          teams.data.map(team => 
+            axios.delete(`http://localhost:3001/teams/${team.id}`)
+            .catch(err => console.error(`Failed to delete team ${team.id}:`, err))
+          )
+        );
+      }
+
+      // Finally delete decks
+      if (decks.data.length > 0) {
+        await Promise.all(
+          decks.data.map(deck => 
+            axios.delete(`http://localhost:3001/decks/${deck.id}`)
+            .catch(err => console.error(`Failed to delete deck ${deck.id}:`, err))
+          )
+        );
+      }
+
+      // Clear local storage
+      localStorage.clear();
+
+      // Reset stats
+      setTeamCount(0);
+      setBattleCount(0);
+      setDeckCount(0);
+      setShowResetConfirm(false);
+
+      // Show success message
+      alert("All data has been reset successfully!");
+
+      // Refresh the page to ensure clean state
+      window.location.reload();
+    } catch (error) {
+      console.error("Error during reset:", error);
+      let errorMessage = "Error resetting data. ";
+      
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        errorMessage += `Server error: ${error.response.status} - ${error.response.data}`;
+      } else if (error.request) {
+        // The request was made but no response was received
+        errorMessage += "No response from server. Please check your connection.";
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        errorMessage += error.message;
+      }
+      
+      alert(errorMessage);
     }
   }
 
@@ -76,8 +149,43 @@ const Home = () => {
           <Link to="/battle" className="hero-button">
             Start Battle
           </Link>
+          <button 
+            className="hero-button reset-button"
+            onClick={() => setShowResetConfirm(true)}
+          >
+            Reset All Data
+          </button>
         </div>
       </div>
+
+      {showResetConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Reset All Data</h3>
+            <p>Are you sure you want to delete all your data? This will remove:</p>
+            <ul>
+              <li>Your Team ({teamCount} Pokémon)</li>
+              <li>Battle History ({battleCount} Battles)</li>
+              <li>Decks ({deckCount} Decks)</li>
+            </ul>
+            <p>This action cannot be undone!</p>
+            <div className="modal-buttons">
+              <button 
+                className="confirm-button"
+                onClick={handleResetAllData}
+              >
+                Yes, Reset Everything
+              </button>
+              <button 
+                className="cancel-button"
+                onClick={() => setShowResetConfirm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="stats-section">
         <div className="stat-card">

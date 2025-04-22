@@ -20,7 +20,7 @@ const PokemonBattle = () => {
   const [firstRoundWinner, setFirstRoundWinner] = useState(null)
   const [selectedDeck, setSelectedDeck] = useState(null)
   const [defeatedPokemon, setDefeatedPokemon] = useState({ player: [], opponent: [] })
-
+  const [currentHP, setCurrentHP] = useState({ player: 0, opponent: 0 })
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -90,10 +90,46 @@ const PokemonBattle = () => {
 
   const selectPokemon = (pokemon) => {
     setSelectedPokemon(pokemon)
+    // Automatically select opponent's Pokemon
+    const opponent = aiSelectPokemon()
+    setSelectedOpponent(opponent)
   }
 
-  const selectOpponent = (pokemon) => {
-    setSelectedOpponent(pokemon)
+  // Calculate damage based on Attack vs HP
+  const calculateDamage = (attacker, defender) => {
+    const attack = attacker.stats.find(stat => stat.stat.name === "attack").base_stat
+    const defense = defender.stats.find(stat => stat.stat.name === "defense").base_stat
+    
+    // Basic damage formula: (Attack * 2 / Defense) * Random factor (0.85 to 1.15)
+    const randomFactor = 0.85 + Math.random() * 0.3
+    const damage = Math.floor((attack * 2 / defense) * randomFactor)
+    
+    // Ensure minimum damage of 1
+    return Math.max(1, damage)
+  }
+
+  // Determine who goes first based on Speed
+  const determineFirstAttacker = (pokemon1, pokemon2) => {
+    const speed1 = pokemon1.stats.find(stat => stat.stat.name === "speed").base_stat
+    const speed2 = pokemon2.stats.find(stat => stat.stat.name === "speed").base_stat
+    
+    // If speeds are equal, randomly choose who goes first
+    if (speed1 === speed2) {
+      return Math.random() < 0.5 ? "player" : "opponent"
+    }
+    
+    return speed1 > speed2 ? "player" : "opponent"
+  }
+
+  // AI opponent behavior
+  const aiSelectPokemon = () => {
+    // Filter out defeated Pokemon
+    const availablePokemon = opponentTeam.filter(p => !defeatedPokemon.opponent.includes(p.id))
+    if (availablePokemon.length === 0) return null
+
+    // Randomly select a Pokemon from available ones
+    const randomIndex = Math.floor(Math.random() * availablePokemon.length)
+    return availablePokemon[randomIndex]
   }
 
   const showWinner = () => {
@@ -103,72 +139,77 @@ const PokemonBattle = () => {
         return
       }
 
-      console.log("Selected Pokémon:", selectedPokemon)
-      console.log("Selected Opponent:", selectedOpponent)
+      // Initialize HP for both Pokemon
+      const playerHP = selectedPokemon.stats.find(stat => stat.stat.name === "hp").base_stat
+      const opponentHP = selectedOpponent.stats.find(stat => stat.stat.name === "hp").base_stat
+      setCurrentHP({ player: playerHP, opponent: opponentHP })
 
-      if (!selectedPokemon.stats || !Array.isArray(selectedPokemon.stats)) {
-        console.error("Player Pokémon stats missing or invalid:", selectedPokemon)
-        alert("Error: Your Pokémon's stats are missing. Please try selecting a different Pokémon.")
-        return
-      }
+      // Determine who attacks first
+      const firstAttacker = determineFirstAttacker(selectedPokemon, selectedOpponent)
+      const newLog = []
+      newLog.push(`=== Round ${round}: ${selectedPokemon.name} vs ${selectedOpponent.name} ===`)
+      newLog.push(`${firstAttacker === "player" ? selectedPokemon.name : selectedOpponent.name} moves first due to higher Speed!`)
 
-      if (!selectedOpponent.stats || !Array.isArray(selectedOpponent.stats)) {
-        console.error("Opponent Pokémon stats missing or invalid:", selectedOpponent)
-        alert("Error: Opponent's Pokémon stats are missing. Please try selecting a different Pokémon.")
-        return
-      }
+      let currentPlayerHP = playerHP
+      let currentOpponentHP = opponentHP
+      let roundWinner = null
 
-      // Get all core stats to compare
-      const statNames = ["hp", "attack", "defense", "special-attack", "special-defense", "speed"]
-      const statDisplayNames = ["HP", "Attack", "Defense", "Special Attack", "Special Defense", "Speed"]
+      // Battle loop
+      while (currentPlayerHP > 0 && currentOpponentHP > 0) {
+        if (firstAttacker === "player") {
+          // Player attacks first
+          const damage = calculateDamage(selectedPokemon, selectedOpponent)
+          currentOpponentHP -= damage
+          newLog.push(`${selectedPokemon.name} deals ${damage} damage to ${selectedOpponent.name}! (HP: ${Math.max(0, currentOpponentHP)})`)
 
-      // Compare stats and count wins for this round
-      let playerRoundWins = 0
-      let opponentRoundWins = 0
-      const statComparison = []
+          if (currentOpponentHP <= 0) {
+            roundWinner = "player"
+            break
+          }
 
-      statNames.forEach((statName, index) => {
-        const displayName = statDisplayNames[index]
+          // Opponent attacks
+          const oppDamage = calculateDamage(selectedOpponent, selectedPokemon)
+          currentPlayerHP -= oppDamage
+          newLog.push(`${selectedOpponent.name} deals ${oppDamage} damage to ${selectedPokemon.name}! (HP: ${Math.max(0, currentPlayerHP)})`)
 
-        // Find the stat in the stats array
-        const playerStatObj = selectedPokemon.stats.find(s => s.stat.name === statName)
-        const opponentStatObj = selectedOpponent.stats.find(s => s.stat.name === statName)
+          if (currentPlayerHP <= 0) {
+            roundWinner = "opponent"
+            break
+          }
+        } else {
+          // Opponent attacks first
+          const oppDamage = calculateDamage(selectedOpponent, selectedPokemon)
+          currentPlayerHP -= oppDamage
+          newLog.push(`${selectedOpponent.name} deals ${oppDamage} damage to ${selectedPokemon.name}! (HP: ${Math.max(0, currentPlayerHP)})`)
 
-        // Get the base_stat value, default to 0 if not found
-        const playerStat = playerStatObj ? playerStatObj.base_stat : 0
-        const opponentStat = opponentStatObj ? opponentStatObj.base_stat : 0
+          if (currentPlayerHP <= 0) {
+            roundWinner = "opponent"
+            break
+          }
 
-        let winner = "draw"
-        if (playerStat > opponentStat) {
-          playerRoundWins++
-          winner = "player"
-        } else if (opponentStat > playerStat) {
-          opponentRoundWins++
-          winner = "opponent"
+          // Player attacks
+          const damage = calculateDamage(selectedPokemon, selectedOpponent)
+          currentOpponentHP -= damage
+          newLog.push(`${selectedPokemon.name} deals ${damage} damage to ${selectedOpponent.name}! (HP: ${Math.max(0, currentOpponentHP)})`)
+
+          if (currentOpponentHP <= 0) {
+            roundWinner = "player"
+            break
+          }
         }
+      }
 
-        statComparison.push({
-          stat: displayName,
-          player: playerStat,
-          opponent: opponentStat,
-          winner: winner,
-        })
-      })
-
-      // Determine round winner
-      let roundWinner = "draw"
-      if (playerRoundWins >= 3) {
-        roundWinner = "player"
+      // Update battle log with round results
+      newLog.push(`Round Winner: ${roundWinner === "player" ? selectedPokemon.name : selectedOpponent.name}`)
+      
+      if (roundWinner === "player") {
         setPlayerWins(prev => prev + 1)
-        // Add defeated opponent Pokémon
         setDefeatedPokemon(prev => ({
           ...prev,
           opponent: [...prev.opponent, selectedOpponent.id]
         }))
-      } else if (opponentRoundWins >= 3) {
-        roundWinner = "opponent"
+      } else {
         setOpponentWins(prev => prev + 1)
-        // Add defeated player Pokémon
         setDefeatedPokemon(prev => ({
           ...prev,
           player: [...prev.player, selectedPokemon.id]
@@ -180,26 +221,12 @@ const PokemonBattle = () => {
         setFirstRoundWinner(roundWinner)
       }
 
-      // Update battle log with round results
-      const newLog = [...battleLog]
-      newLog.push(`=== Round ${round}: ${selectedPokemon.name} vs ${selectedOpponent.name} ===`)
-      newLog.push("=== Stat Comparison ===")
-      statComparison.forEach((comparison) => {
-        newLog.push(
-          `${comparison.stat}: ${selectedPokemon.name} (${comparison.player}) vs ${selectedOpponent.name} (${comparison.opponent})`
-        )
-        newLog.push(
-          `Winner: ${comparison.winner === "draw" ? "Draw" : comparison.winner === "player" ? selectedPokemon.name : selectedOpponent.name}`
-        )
-      })
-      newLog.push(`Round Winner: ${roundWinner === "draw" ? "Draw" : roundWinner === "player" ? selectedPokemon.name : selectedOpponent.name}`)
-      
       // Get current scores for the log
       const currentPlayerWins = roundWinner === "player" ? playerWins + 1 : playerWins
       const currentOpponentWins = roundWinner === "opponent" ? opponentWins + 1 : opponentWins
       newLog.push(`Score: Player ${currentPlayerWins} - Opponent ${currentOpponentWins}`)
 
-      setBattleLog(newLog)
+      setBattleLog(prev => [...prev, ...newLog])
 
       // Check if any player has won 3 rounds
       const updatedPlayerWins = roundWinner === "player" ? playerWins + 1 : playerWins
@@ -215,11 +242,13 @@ const PokemonBattle = () => {
         // Prepare for next round
         setRound(round + 1)
         setSelectedPokemon(null)
-        setSelectedOpponent(null)
+        // AI selects next Pokemon
+        const nextOpponent = aiSelectPokemon()
+        setSelectedOpponent(nextOpponent)
       }
     } catch (error) {
       console.error("Battle error:", error)
-      alert(`Error starting battle: ${error.message}`)
+      alert(`Error during battle: ${error.message}`)
     }
   }
 
@@ -264,114 +293,101 @@ const PokemonBattle = () => {
       </div>
 
       <div className="battle-field">
-        <div className="battle-teams">
-          <div className={`team-section your-team ${winningTeam === "player" ? "winner" : ""}`}>
-            <h3>Your Team</h3>
-            <div className="team-pokemon">
-              {yourTeam.map((pokemon) => (
-                <div
-                  key={pokemon.id}
-                  className={`pokemon-battle-card ${selectedPokemon?.id === pokemon.id ? "selected" : ""} ${winningTeam === "player" ? "winner" : ""} ${defeatedPokemon.player.includes(pokemon.id) ? "defeated" : ""}`}
-                  onClick={() => !defeatedPokemon.player.includes(pokemon.id) && selectPokemon(pokemon)}
-                >
-                  <div className="pokemon-name">{pokemon.name}</div>
-                  <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
-                  <div className="pokemon-stats">
-                    <div className="stat-bar">
-                      <div className="stat-fill" style={{ width: "100%" }}></div>
-                    </div>
+        <div className="battle-layout">
+          <div className="team-container your-team-container">
+            <h3>YOUR TEAM</h3>
+            <div className={`team-section your-team ${winningTeam === "player" ? "winner" : ""}`}>
+              <div className="team-pokemon">
+                {yourTeam.map((pokemon) => (
+                  <div
+                    key={pokemon.id}
+                    className={`pokemon-battle-card ${selectedPokemon?.id === pokemon.id ? "selected" : ""} ${winningTeam === "player" ? "winner" : ""} ${defeatedPokemon.player.includes(pokemon.id) ? "defeated" : ""}`}
+                    onClick={() => !defeatedPokemon.player.includes(pokemon.id) && selectPokemon(pokemon)}
+                  >
+                    <div className="pokemon-name">{pokemon.name}</div>
+                    <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
+                    {defeatedPokemon.player.includes(pokemon.id) && <div className="defeated-overlay">X</div>}
                   </div>
-                  {defeatedPokemon.player.includes(pokemon.id) && <div className="defeated-overlay">X</div>}
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="battle-log-container">
-  <h3>Battle Log</h3>
-  <div className="battle-log">
-    {battleLog.map((log, index) => (
-      <div 
-        key={index} 
-        className={`log-entry 
-          ${log.toLowerCase().includes('winner') ? 'log-winner' : ''}
-          ${log.toLowerCase().includes('hp') ? 'log-hp' : ''}
-          ${log.toLowerCase().includes('attack') ? 'log-attack' : ''}
-          ${log.toLowerCase().includes('defense') ? 'log-defense' : ''}
-          ${log.toLowerCase().includes('special attack') ? 'log-special-attack' : ''}
-          ${log.toLowerCase().includes('special defense') ? 'log-special-defense' : ''}
-          ${log.toLowerCase().includes('speed') ? 'log-speed' : ''}
-        `}
-      >
-        {log}
-      </div>
-    ))}
-  </div>
-</div>
-
-
-          
-
-          <div className={`team-section opponent-team ${winningTeam === "opponent" ? "winner" : ""}`}>
-            <h3>Opponent's Team</h3>
-            <div className="team-pokemon">
-              {opponentTeam.map((pokemon) => (
-                <div
-                  key={pokemon.id}
-                  className={`pokemon-battle-card ${selectedOpponent?.id === pokemon.id ? "selected" : ""} ${winningTeam === "opponent" ? "winner" : ""} ${defeatedPokemon.opponent.includes(pokemon.id) ? "defeated" : ""}`}
-                  onClick={() => !defeatedPokemon.opponent.includes(pokemon.id) && selectOpponent(pokemon)}
-                >
-                  <div className="pokemon-name">{pokemon.name}</div>
-                  <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
-                  <div className="pokemon-stats">
-                    <div className="stat-bar">
-                      <div className="stat-fill" style={{ width: "100%" }}></div>
-                    </div>
+          <div className="battle-info-container">
+            <div className="battle-log-container">
+              <h3>BATTLE LOG</h3>
+              <div className="battle-log">
+                {battleLog.map((log, index) => (
+                  <div 
+                    key={index} 
+                    className={`log-entry 
+                      ${log.toLowerCase().includes('winner') ? 'log-winner' : ''}
+                      ${log.toLowerCase().includes('hp') ? 'log-hp' : ''}
+                      ${log.toLowerCase().includes('attack') ? 'log-attack' : ''}
+                      ${log.toLowerCase().includes('defense') ? 'log-defense' : ''}
+                      ${log.toLowerCase().includes('special attack') ? 'log-special-attack' : ''}
+                      ${log.toLowerCase().includes('special defense') ? 'log-special-defense' : ''}
+                      ${log.toLowerCase().includes('speed') ? 'log-speed' : ''}
+                    `}
+                  >
+                    {log}
                   </div>
-                  {defeatedPokemon.opponent.includes(pokemon.id) && <div className="defeated-overlay">X</div>}
+                ))}
+              </div>
+            </div>
+
+            {!winner && (
+              <div className="battle-controls">
+                <div className="selection-status">
+                  {!selectedPokemon && <p>Select Your Pokémon</p>}
+                  {selectedPokemon && selectedOpponent && (
+                    <p>Ready to battle! {selectedPokemon.name} VS {selectedOpponent.name}</p>
+                  )}
                 </div>
-              ))}
+                <button
+                  className="show-winner-button"
+                  onClick={showWinner}
+                  disabled={!selectedPokemon || !selectedOpponent}
+                >
+                  Start Round {round}
+                </button>
+              </div>
+            )}
+
+            {winner && (
+              <div className="battle-result">
+                <h2>{winner === "player" ? "You Won the Battle!" : "You Lost the Battle!"}</h2>
+                {firstRoundWinner && (
+                  <div className="first-round-score">
+                    <h3>Round 1 Winner: {firstRoundWinner === "player" ? "You" : "Opponent"}</h3>
+                    <p>Score: {firstRoundWinner === "player" ? "1-0" : "0-1"}</p>
+                  </div>
+                )}
+                <button className="new-battle-button" onClick={() => navigate("/battle")}>
+                  Start New Battle
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="team-container opponent-team-container">
+            <h3>OPPONENT'S TEAM</h3>
+            <div className={`team-section opponent-team ${winningTeam === "opponent" ? "winner" : ""}`}>
+              <div className="team-pokemon">
+                {opponentTeam.map((pokemon) => (
+                  <div
+                    key={pokemon.id}
+                    className={`pokemon-battle-card ${selectedOpponent?.id === pokemon.id ? "selected" : ""} ${winningTeam === "opponent" ? "winner" : ""} ${defeatedPokemon.opponent.includes(pokemon.id) ? "defeated" : ""}`}
+                  >
+                    <div className="pokemon-name">{pokemon.name}</div>
+                    <img src={pokemon.sprites.front_default || "/placeholder.svg"} alt={pokemon.name} />
+                    {defeatedPokemon.opponent.includes(pokemon.id) && <div className="defeated-overlay">X</div>}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-
-        {!winner && (
-          <div className="battle-controls">
-            <div className="selection-status">
-              {!selectedPokemon && <p>Select Your Pokémon</p>}
-              {!selectedOpponent && <p>Select Opponent's Pokémon</p>}
-            </div>
-            <button
-              className="show-winner-button"
-              onClick={showWinner}
-              disabled={!selectedPokemon || !selectedOpponent}
-            >
-              Start Round {round}
-            </button>
-          </div>
-        )}
-
-        {winner && (
-          <div className="battle-result">
-            <h2>{winner === "player" ? "You Won the Battle!" : "You Lost the Battle!"}</h2>
-            {firstRoundWinner && (
-              <div className="first-round-score">
-                <h3>Round 1 Winner: {firstRoundWinner === "player" ? "You" : "Opponent"}</h3>
-                <p>Score: {firstRoundWinner === "player" ? "1-0" : "0-1"}</p>
-              </div>
-            )}
-            <div className="battle-stats">
-              {battleLog.map((log, index) => (
-                <div key={index} className="stat-entry">
-                  {log}
-                </div>
-              ))}
-            </div>
-            <button className="new-battle-button" onClick={() => navigate("/battle")}>
-              Start New Battle
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )
