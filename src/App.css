@@ -44,11 +44,11 @@ body {
 
 .pokemon-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
   padding: 20px;
-  
 }
+
 .pokemon-name{
   font-size: 1.1rem;
 }
@@ -80,7 +80,6 @@ body {
     text-transform: capitalize;
    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
   }
-  
 }
 
 .pokemon-detail {

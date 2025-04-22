@@ -35,7 +35,7 @@ const Battle = () => {
 
   const selectDeck = async (deck) => {
     try {
-      console.log("Selected deck:", deck) // Debug log
+      console.log("Selected deck:", deck)
       setSelectedDeck(deck)
       let team = []
       // If the deck already has pokemon data, use it directly
@@ -71,7 +71,6 @@ const Battle = () => {
       )
 
       setYourTeam(completeTeam)
-      await generateOpponentTeam()
     } catch (error) {
       console.error("Error selecting deck:", error)
     }
@@ -88,49 +87,47 @@ const Battle = () => {
       )
 
       // Fetch each Pokémon's complete data
-      for (const id of pokemonIds) {
-        const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
-        const pokemonData = response.data
+      const opponentPromises = pokemonIds.map(id => 
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
+      )
 
-        // Format the Pokémon data to match our structure
-        const formattedPokemon = {
-          id: pokemonData.id,
-          name: pokemonData.name,
-          sprites: {
-            front_default: pokemonData.sprites.front_default,
-          },
-          stats: pokemonData.stats.map((stat) => ({
-            stat: { name: stat.stat.name },
-            base_stat: stat.base_stat,
-          })),
-        }
+      const responses = await Promise.all(opponentPromises)
+      const formattedTeam = responses.map(response => ({
+        id: response.data.id,
+        name: response.data.name,
+        sprites: {
+          front_default: response.data.sprites.front_default,
+        },
+        stats: response.data.stats.map((stat) => ({
+          stat: { name: stat.stat.name },
+          base_stat: stat.base_stat,
+        })),
+      }))
 
-        opponentTeam.push(formattedPokemon)
-      }
-
-      setOpponentTeam(opponentTeam)
-      console.log("Generated opponent team:", opponentTeam)
+      setOpponentTeam(formattedTeam)
+      console.log("Generated opponent team:", formattedTeam)
+      return formattedTeam
     } catch (error) {
       console.error("Error generating opponent team:", error)
       // Fallback to a default team if the API call fails
-      setOpponentTeam([
-        {
-          id: 1,
-          name: "bulbasaur",
-          sprites: {
-            front_default:
-              "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-          },
-          stats: [
-            { stat: { name: "hp" }, base_stat: 45 },
-            { stat: { name: "attack" }, base_stat: 49 },
-            { stat: { name: "defense" }, base_stat: 49 },
-            { stat: { name: "special-attack" }, base_stat: 65 },
-            { stat: { name: "special-defense" }, base_stat: 65 },
-            { stat: { name: "speed" }, base_stat: 45 },
-          ],
+      const defaultTeam = [{
+        id: 1,
+        name: "bulbasaur",
+        sprites: {
+          front_default:
+            "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
         },
-      ])
+        stats: [
+          { stat: { name: "hp" }, base_stat: 45 },
+          { stat: { name: "attack" }, base_stat: 49 },
+          { stat: { name: "defense" }, base_stat: 49 },
+          { stat: { name: "special-attack" }, base_stat: 65 },
+          { stat: { name: "special-defense" }, base_stat: 65 },
+          { stat: { name: "speed" }, base_stat: 45 },
+        ],
+      }]
+      setOpponentTeam(defaultTeam)
+      return defaultTeam
     }
   }
 
@@ -139,14 +136,28 @@ const Battle = () => {
       alert("Please select a deck first!")
       return
     }
-    // Navigate to PokemonBattle page with team data in state
-    navigate("/pokemon-battle", { 
-      state: { 
-        yourTeam: yourTeam,
-        opponentTeam: opponentTeam,
-        selectedDeck: selectedDeck
-      } 
-    })
+
+    try {
+      // Generate a new random opponent team before starting the battle
+      const newOpponentTeam = await generateOpponentTeam()
+      
+      // Make sure we have both teams before navigating
+      if (!yourTeam.length || !newOpponentTeam.length) {
+        throw new Error("Teams not properly loaded")
+      }
+
+      // Navigate to PokemonBattle page with team data in state
+      navigate("/pokemon-battle", { 
+        state: { 
+          yourTeam: yourTeam,
+          opponentTeam: newOpponentTeam,
+          selectedDeck: selectedDeck
+        } 
+      })
+    } catch (error) {
+      console.error("Error starting battle:", error)
+      alert("Failed to generate opponent team. Please try again.")
+    }
   }
 
   return (
