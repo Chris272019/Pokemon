@@ -1711,6 +1711,37 @@ h3 {
     flex-direction: column;
     align-items: stretch; /* optional: makes full width items */
   }
+  .hero-section {
+    padding: 3rem 1.5rem;
+  }
+
+  .hero-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-section p {
+    font-size: 1rem;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-section {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .submit-name-button {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1723,5 +1754,45 @@ h3 {
   .pokemon-list {
     flex-direction: column;
     align-items: stretch; /* optional: makes full width items */
+  }
+  .home-container {
+    padding: 1rem;
+  }
+
+  .hero-section {
+    padding: 2rem 1rem;
+  }
+
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+
+  .hero-section p {
+    font-size: 0.95rem;
+  }
+
+  .stats-section {
+    grid-template-columns: 1fr;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .name-input-form {
+    max-width: 100%;
+  }
+
+  .hero-buttons {
+    gap: 0.5rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .name-input,
+  .submit-name-button {
+    width: 100%;
   }
 }
