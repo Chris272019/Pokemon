@@ -1140,6 +1140,16 @@ a[href^="#"] {
   object-fit: contain;
 }
 
+.pokemon-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* allows wrapping to the next line if needed */
+  gap: 1rem;       /* spacing between items */
+  justify-content: flex-start; /* align items to the left */
+  align-items: center;
+  padding: 1rem 0;
+}
+
 /* General Styles */
 .battle-log-container {
   padding: 1.5rem;
@@ -1344,11 +1354,7 @@ h3 {
   gap: 2rem;
 }
 
-@media (min-width: 768px) {
-  .battle-results {
-    grid-template-columns: 1fr 1fr;
-  }
-}
+
 
 .battle-list {
   background-color: #f9f9f9;
@@ -1698,10 +1704,24 @@ h3 {
   .pokemon-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+  .battle-results {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pokemon-list {
+    flex-direction: column;
+    align-items: stretch; /* optional: makes full width items */
+  }
 }
 
 @media (max-width: 480px) {
   .pokemon-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .battle-results {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pokemon-list {
+    flex-direction: column;
+    align-items: stretch; /* optional: makes full width items */
   }
 }

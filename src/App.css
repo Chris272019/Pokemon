@@ -53,7 +53,97 @@ body {
   font-size: 1.1rem;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
+  .pokemon-grid {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .pokemon-name {
+    font-size: 1.1rem;
+  }
+  .pokemon-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 0 auto;
+    transition: transform 0.3s ease;
+    display: block;
+  }
+  .pokemon-type {
+    padding: 0.2rem 0.4rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: white;
+    text-transform: capitalize;
+   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); 
+  }
+}
+
+.pokemon-detail {
+  flex: 1;
+  background: var(--screen-bg);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 10px;
+  border: 3px solid #111;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3), 0 5px 15px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+}
+
+.pokemon-image {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 auto;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+.pokemon-image:hover {
+  transform: scale(1.05);
+}
+
+.control-panel {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.led-light {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--button-yellow);
+  box-shadow: 0 0 15px var(--button-yellow);
+  animation: blink 2s infinite;
+}
+.search-bar {
+  max-width: 300px;
+  font-size: 1em;
+  padding: 10px 18px;
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 480px) {
   .pokemon-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -128,7 +218,11 @@ body {
   box-shadow: 0 0 15px var(--button-yellow);
   animation: blink 2s infinite;
 }
-
+.search-bar {
+  max-width: 300px;
+  font-size: 1em;
+  padding: 10px 18px;
+}
 @keyframes blink {
   0%,
   100% {
@@ -138,6 +232,8 @@ body {
     opacity: 0.5;
   }
 }
+
+
 
 .nav-buttons {
   display: flex;
@@ -207,6 +303,14 @@ body {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+  .hero-section{
+    margin-top: 4rem;
+  }
+}
+@media (max-width: 480px) {
   .main-content {
     padding: 1rem;
   }
