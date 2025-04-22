@@ -32,6 +32,21 @@ body {
   flex-direction: column;
   width: 100%;
   height: 100%;
+  background: linear-gradient(to bottom right, #F1C40F, #E74C3C, #3498DB); /* Gradient from yellow to red to blue */
+  background-size: cover; /* Ensure it covers the whole screen */
+  background-position: center; /* Center the background */
+  background-attachment: fixed; /* Keeps background fixed when scrolling */
+}
+.app-container::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://example.com/pokemon-pattern.png'); /* Replace with a subtle Pokemon-themed pattern image */
+  opacity: 0.1; /* Subtle pattern */
+  pointer-events: none;
 }
 
 .main-content {
@@ -253,7 +268,7 @@ body {
 }
 
 .pokedex-button {
-  background-color: red;
+  background-color: #A040A0  ;
   border: 2px solid #111;
   width: 110px;
   height: 60px;
@@ -266,11 +281,12 @@ body {
   color: white;
   transition: all 0.2s ease;
   margin-top: 1rem;
+
 }
 
 .pokedex-button:hover {
   transform: scale(0.95);
-  background-color: blue;
+  background-color:#705898;
   color: white;
 }
 

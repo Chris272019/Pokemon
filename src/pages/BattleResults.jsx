@@ -98,7 +98,7 @@ const BattleResults = () => {
       <div className="control-panel">
         <div className="battle-header">
           <h2>Battle History</h2>
-          <RouterLink to="/" className="pokedex-button">
+          <RouterLink to="/" className="back-button">
             Back to Home
           </RouterLink>
         </div>
