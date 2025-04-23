@@ -359,7 +359,7 @@ const PokemonBattle = () => {
                 <h2>{winner === "player" ? "You Won the Battle!" : "You Lost the Battle!"}</h2>
                 {firstRoundWinner && (
                   <div className="first-round-score">
-                    <h3>Round 1 Winner: {firstRoundWinner === "player" ? "You" : "Opponent"}</h3>
+                    <h3>Winner: {firstRoundWinner === "player" ? "You" : "Opponent"}</h3>
                     <p>Score: {firstRoundWinner === "player" ? "1-0" : "0-1"}</p>
                   </div>
                 )}

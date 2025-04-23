@@ -1291,6 +1291,7 @@ a[href^="#"] {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
+  margin-top: 1rem;
   font-family: 'Segoe UI', sans-serif;
 }
 
@@ -1948,6 +1949,18 @@ h3 {
     grid-template-columns: 1fr; /* Single column on medium screens */
     gap: 1.5rem; /* Reduce gap between items on medium screens */
   }
+  .battle-log-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+  .deck-card {
+    padding: 1.25rem;
+    font-size: 0.95rem;
+  }
+  .decks-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 480px) {
@@ -2090,5 +2103,18 @@ h3 {
   .battle-results {
     grid-template-columns: 1fr; /* Ensure single column on small screens */
     gap: 1rem;
+}
+.battle-log-container {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+.deck-card {
+  padding: 1rem;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Slightly softer shadow */
+}
+.decks-grid {
+  grid-template-columns: 1fr;
 }
 }
