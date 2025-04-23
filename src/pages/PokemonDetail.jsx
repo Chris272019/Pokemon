@@ -46,10 +46,10 @@ const PokemonDetail = () => {
         return
       }
 
-      // Add Pokémon to team
+      // Add Pokémon to team with proper id property
       await axios.post("http://localhost:3001/teams", {
         ...pokemon,
-        teamId: Date.now(), // Add unique ID for team management
+        id: pokemon.id, // Use existing Pokémon id for backend
       })
 
       // Show success message

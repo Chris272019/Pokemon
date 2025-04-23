@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import axios from "axios"
 
 const Team = () => {
+  const navigate = useNavigate()
   const [team, setTeam] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -13,7 +14,6 @@ const Team = () => {
   const [showDeckModal, setShowDeckModal] = useState(false)
   const [newDeckName, setNewDeckName] = useState("")
   const [newDeckElement, setNewDeckElement] = useState("")
-  // Removed pokemonToRemove state
   const [showRemoveAllModal, setShowRemoveAllModal] = useState(false)
 
   const formatDate = (dateString) => {
@@ -54,13 +54,15 @@ const Team = () => {
 
   const removeFromTeam = async (pokemonId) => {
     try {
-      setError(null) // Clear error state when starting removal process
+      const confirmed = window.confirm("Are you sure you want to remove this Pokémon from your team?")
+      if (!confirmed) {
+        return
+      }
+      setError(null)
       const pokemonToRemove = team.find((p) => p.id === pokemonId)
       if (!pokemonToRemove) {
         return
       }
-
-      // Directly call confirmRemove with the id
       await confirmRemove(pokemonToRemove.id)
     } catch (error) {
       console.error("Error removing Pokémon:", error)
@@ -72,8 +74,6 @@ const Team = () => {
     try {
       setError(null)
       await axios.delete(`http://localhost:3001/teams/${id}`)
-
-      // Refresh the team state from backend after deletion
       await fetchTeam()
     } catch (error) {
       console.error("Error removing Pokémon:", error)
@@ -91,7 +91,6 @@ const Team = () => {
         return
       }
 
-      // Store the team in the deck
       await axios.patch(`http://localhost:3001/decks/${deckId}`, {
         pokemon: team.map((p) => ({
           id: p.id,
@@ -101,16 +100,13 @@ const Team = () => {
         })),
       })
 
-      // Remove each Pokémon from the team
       for (const pokemon of team) {
         await axios.delete(`http://localhost:3001/teams/${pokemon.id}`)
       }
 
-      // Update the UI immediately
       setTeam([])
       setEmptyDecks(prev => prev.filter(d => d.id !== deckId))
 
-      // Show success message
       const successMessage = document.createElement("div")
       successMessage.className = "success-message"
       successMessage.textContent = `Team stored in ${deck.name}!`
@@ -118,7 +114,7 @@ const Team = () => {
 
       setTimeout(() => {
         successMessage.remove()
-        window.location.reload()
+        navigate("/decks")
       }, 2000)
     } catch (error) {
       console.error("Error storing team in deck:", error)
@@ -131,11 +127,11 @@ const Team = () => {
   }
 
   const getStatColor = (statValue) => {
-    if (statValue >= 100) return "#4CAF50" // Green for high stats
-    if (statValue >= 75) return "#8BC34A" // Light green for good stats
-    if (statValue >= 50) return "#FFC107" // Yellow for average stats
-    if (statValue >= 25) return "#FF9800" // Orange for below average stats
-    return "#F44336" // Red for low stats
+    if (statValue >= 100) return "#4CAF50"
+    if (statValue >= 75) return "#8BC34A"
+    if (statValue >= 50) return "#FFC107"
+    if (statValue >= 25) return "#FF9800"
+    return "#F44336"
   }
 
   const formatStatName = (statName) => {
@@ -162,7 +158,6 @@ const Team = () => {
         pokemon: [],
       })
 
-      // Store the team in the newly created deck
       await storeTeamInDeck(response.data.id)
       setShowDeckModal(false)
       setNewDeckName("")
@@ -176,11 +171,9 @@ const Team = () => {
   const removeAllPokemon = async () => {
     try {
       setError(null)
-      // Delete all Pokémon from the team
       for (const pokemon of team) {
         await axios.delete(`http://localhost:3001/teams/${pokemon.id}`)
       }
-      // Refresh the team state from backend after deletion
       await fetchTeam()
       setShowRemoveAllModal(false)
     } catch (error) {
@@ -355,8 +348,6 @@ const Team = () => {
                 </div>
               </div>
             )}
-
-            {/* Removed confirmation modal for pokemonToRemove */}
 
             {showRemoveAllModal && (
               <div className="modal-overlay">
