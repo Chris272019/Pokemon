@@ -83,6 +83,28 @@ app.delete('/decks/:id', (req, res) => {
   res.json({ message: 'Deck deleted successfully' });
 });
 
+// Pokemon Routes
+app.get('/pokemon', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  res.json(db.pokemon || []);
+});
+
+app.post('/pokemon', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  const newPokemon = { ...req.body, id: Date.now().toString() };
+  db.pokemon = db.pokemon || [];
+  db.pokemon.push(newPokemon);
+  fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
+  res.json(newPokemon);
+});
+
+app.delete('/pokemon/:id', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  db.pokemon = db.pokemon.filter(pokemon => pokemon.id !== req.params.id);
+  fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
+  res.json({ message: 'Pokemon deleted successfully' });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

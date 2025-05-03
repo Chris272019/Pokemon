@@ -216,23 +216,23 @@ const Team = () => {
       </div>
 
       <div className="pokedex-screen">
-      {team.length === 0 ? (
-        <div className="empty-team">
-          <h3>Your team is empty!</h3>
-          <p>Add some Pokémon to get started.</p>
-          <RouterLink to="/pokemon" className="pokedex-button">
-            Find Pokémon
-          </RouterLink>
-        </div>
-      ) : (
-        <>
+        {team.length === 0 ? (
+          <div className="empty-team">
+            <h3>Your team is empty!</h3>
+            <p>Add some Pokémon to get started.</p>
+            <RouterLink to="/pokemon" className="pokedex-button">
+              Find Pokémon
+            </RouterLink>
+          </div>
+        ) : (
+          <>
           {error && (
             <div className="error-message" style={{ color: "red", marginBottom: "1rem" }}>
               {error}
             </div>
           )}
-          <div className="team-grid">
-            {team.map((pokemon) => (
+            <div className="team-grid">
+              {team.map((pokemon) => (
                 <div
                   key={pokemon.id}
                   className={`pokemon-card ${selectedPokemon?.id === pokemon.id ? "selected" : ""}`}
