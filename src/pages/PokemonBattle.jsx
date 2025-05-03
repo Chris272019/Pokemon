@@ -5,8 +5,6 @@ import axios from "axios"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import { useLocation } from "react-router-dom"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
-
 const PokemonBattle = () => {
   const [yourTeam, setYourTeam] = useState([])
   const [opponentTeam, setOpponentTeam] = useState([])
@@ -270,7 +268,7 @@ const PokemonBattle = () => {
         },
       }
 
-      await axios.post(`${API_BASE_URL}/battles`, battleData)
+      await axios.post("http://localhost:3001/battles", battleData)
       console.log("Battle result saved successfully")
     } catch (error) {
       console.error("Error saving battle result:", error)

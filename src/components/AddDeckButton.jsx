@@ -3,8 +3,6 @@
 import { useState } from "react"
 import axios from "axios"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
-
 const AddDeckButton = ({ onDeckAdded }) => {
   const [showModal, setShowModal] = useState(false)
   const [deckName, setDeckName] = useState("")
@@ -25,7 +23,7 @@ const AddDeckButton = ({ onDeckAdded }) => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/decks`, {
+      const response = await axios.post("http://localhost:3001/decks", {
         name: deckName,
         element: deckElement,
         pokemon: [],

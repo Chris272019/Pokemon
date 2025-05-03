@@ -4,8 +4,6 @@ import { Link } from "react-router-dom"
 import { useState, useEffect } from "react"
 import axios from "axios"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
-
 const Home = () => {
   const [teamCount, setTeamCount] = useState(0)
   const [battleCount, setBattleCount] = useState(0)
@@ -18,9 +16,9 @@ const Home = () => {
     const fetchStats = async () => {
       try {
         const [teamRes, battleRes, deckRes] = await Promise.all([
-          axios.get(`${API_BASE_URL}/teams`),
-          axios.get(`${API_BASE_URL}/battles`),
-          axios.get(`${API_BASE_URL}/decks`),
+          axios.get("http://localhost:3001/teams"),
+          axios.get("http://localhost:3001/battles"),
+          axios.get("http://localhost:3001/decks"),
         ])
 
         setTeamCount(teamRes.data.length)
@@ -52,9 +50,9 @@ const Home = () => {
     try {
       // First, get all the data
       const [teams, battles, decks] = await Promise.all([
-        axios.get(`${API_BASE_URL}/teams`),
-        axios.get(`${API_BASE_URL}/battles`),
-        axios.get(`${API_BASE_URL}/decks`)
+        axios.get("http://localhost:3001/teams"),
+        axios.get("http://localhost:3001/battles"),
+        axios.get("http://localhost:3001/decks")
       ]);
 
       // Delete in sequence to avoid potential foreign key conflicts
@@ -62,7 +60,7 @@ const Home = () => {
       if (battles.data.length > 0) {
         await Promise.all(
           battles.data.map(battle => 
-            axios.delete(`${API_BASE_URL}/battles/${battle.id}`)
+            axios.delete(`http://localhost:3001/battles/${battle.id}`)
             .catch(err => console.error(`Failed to delete battle ${battle.id}:`, err))
           )
         );
@@ -72,7 +70,7 @@ const Home = () => {
       if (teams.data.length > 0) {
         await Promise.all(
           teams.data.map(team => 
-            axios.delete(`${API_BASE_URL}/teams/${team.id}`)
+            axios.delete(`http://localhost:3001/teams/${team.id}`)
             .catch(err => console.error(`Failed to delete team ${team.id}:`, err))
           )
         );
@@ -82,7 +80,7 @@ const Home = () => {
       if (decks.data.length > 0) {
         await Promise.all(
           decks.data.map(deck => 
-            axios.delete(`${API_BASE_URL}/decks/${deck.id}`)
+            axios.delete(`http://localhost:3001/decks/${deck.id}`)
             .catch(err => console.error(`Failed to delete deck ${deck.id}:`, err))
           )
         );
