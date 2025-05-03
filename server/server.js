@@ -9,17 +9,19 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:5173',
-    'http://127.0.0.1:3000',
-    'https://your-netlify-app.netlify.app' // Replace with your Netlify URL
-  ],
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-netlify-app.netlify.app'] // Replace with your actual Netlify URL
+    : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true
 }));
 app.use(express.json());
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '../public')));
