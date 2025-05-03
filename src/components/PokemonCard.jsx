@@ -4,6 +4,8 @@ import { useState } from "react"
 import axios from "axios"
 import { Link, useNavigate } from "react-router-dom"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const PokemonCard = ({ pokemon }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -18,10 +20,10 @@ const PokemonCard = ({ pokemon }) => {
       setError(null)
 
       // Check if team is full
-      const teamResponse = await axios.get("http://localhost:3001/teams")
+      const teamResponse = await axios.get(`${API_BASE_URL}/teams`)
       if (teamResponse.data.length >= 6) {
         // Check for empty decks
-        const decksResponse = await axios.get("http://localhost:3001/decks")
+        const decksResponse = await axios.get(`${API_BASE_URL}/decks`)
         const emptyDecks = decksResponse.data.filter((deck) => deck.pokemon.length === 0)
 
         if (emptyDecks.length === 0) {
@@ -43,12 +45,16 @@ const PokemonCard = ({ pokemon }) => {
         return
       }
 
-      // Add to team
-      await axios.post("http://localhost:3001/teams", {
+      // Add to team with all necessary data
+      await axios.post(`${API_BASE_URL}/teams`, {
         id: pokemon.id,
         name: pokemon.name,
         sprites: pokemon.sprites,
         types: pokemon.types,
+        stats: pokemon.stats,
+        abilities: pokemon.abilities,
+        moves: pokemon.moves,
+        createdAt: new Date().toISOString()
       })
 
       // Show success message

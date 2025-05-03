@@ -73,11 +73,11 @@ const BattleResults = () => {
   const getBattleResultClass = (result) => {
     switch (result) {
       case "win":
-        return "battle-win"
+        return "win"
       case "loss":
-        return "battle-loss"
+        return "loss"
       case "draw":
-        return "battle-draw"
+        return "draw"
       default:
         return ""
     }
@@ -96,10 +96,9 @@ const BattleResults = () => {
   return (
     <div className="pokedex-container">
       <div className="control-panel">
-        <div className="led-light"></div>
         <div className="battle-header">
-          <h2>Battle Results</h2>
-          <RouterLink to="/" className="pokedex-button">
+          <h2>Battle History</h2>
+          <RouterLink to="/" className="back-button">
             Back to Home
           </RouterLink>
         </div>
@@ -107,15 +106,19 @@ const BattleResults = () => {
 
       <div className="pokedex-screen">
         {loading ? (
-          <div className="loading">Loading battle results...</div>
+          <div className="loading">
+            <p>Loading battle history...</p>
+          </div>
         ) : error ? (
-          <div className="error">{error}</div>
+          <div className="error">
+            <p>{error}</p>
+          </div>
         ) : battles.length === 0 ? (
           <div className="empty-battles">
-            <h3>No battle results yet!</h3>
-            <p>Start battling to see your results here.</p>
+            <h3>No Battles Yet</h3>
+            <p>Start your Pokémon journey by challenging other trainers!</p>
             <RouterLink to="/battle" className="pokedex-button">
-              Start Battle
+              Start First Battle
             </RouterLink>
           </div>
         ) : (
@@ -125,7 +128,10 @@ const BattleResults = () => {
                 <div
                   key={battle.id}
                   className={`battle-item ${getBattleResultClass(battle.result)}`}
-                  onClick={() => setSelectedBattle(battle)}
+                  onClick={() => {
+                    console.log("Selected battle:", battle)
+                    setSelectedBattle(battle)
+                  }}
                 >
                   <div className="battle-info">
                     <span className="battle-date">{formatDate(battle.date)}</span>
@@ -137,69 +143,54 @@ const BattleResults = () => {
             </div>
 
             {selectedBattle && (
-              <div className="battle-details">
-                <h3>Battle Details</h3>
-                <div className="detail-section">
-                  <h4>Date</h4>
-                  <p>{formatDate(selectedBattle.date)}</p>
-                </div>
-                <div className="detail-section">
-                  <h4>Opponent</h4>
-                  <p>{selectedBattle.opponent}</p>
-                </div>
-                <div className="detail-section">
-                  <h4>Result</h4>
-                  <p className={getBattleResultClass(selectedBattle.result)}>{selectedBattle.result.toUpperCase()}</p>
-                </div>
-                <div className="detail-section">
-                  <h4>Pokémon</h4>
-                  <div className="battle-pokemon">
-                    <div className="pokemon-card">
-                      <img
-                        src={selectedBattle.yourTeam[0].sprites.front_default || "/placeholder.svg"}
-                        alt={selectedBattle.yourTeam[0].name}
-                      />
-                      <p>{selectedBattle.yourTeam[0].name}</p>
-                    </div>
-                    <div className="vs">VS</div>
-                    <div className="pokemon-card">
-                      <img
-                        src={selectedBattle.opponentTeam[0].sprites.front_default || "/placeholder.svg"}
-                        alt={selectedBattle.opponentTeam[0].name}
-                      />
-                      <p>{selectedBattle.opponentTeam[0].name}</p>
-                    </div>
+              <>
+                <div className="battle-details-overlay" onClick={() => setSelectedBattle(null)} />
+                <div className="battle-details">
+                  <h3>BATTLE DETAILS</h3>
+                  <div className="detail-section">
+                    <h4>Date & Time</h4>
+                    <p className="timestamp">{formatDate(selectedBattle.date)}</p>
                   </div>
-                </div>
-                <div className="detail-section">
-                  <h4>Stat Comparison</h4>
-                  {selectedBattle.statComparison.map((comparison, index) => (
-                    <div key={index} className="stat-comparison">
-                      <p>{comparison.stat}:</p>
-                      <p>
-                        {selectedBattle.yourTeam[0].name} ({comparison.player}) vs {selectedBattle.opponentTeam[0].name}{" "}
-                        ({comparison.opponent})
-                      </p>
-                      <p>
-                        Winner:{" "}
-                        {comparison.winner === "draw"
-                          ? "Draw"
-                          : comparison.winner === "player"
-                            ? selectedBattle.yourTeam[0].name
-                            : selectedBattle.opponentTeam[0].name}
-                      </p>
+                  {selectedBattle.yourTeam && selectedBattle.opponentTeam && (
+                    <div className="detail-section">
+                      <h4>Teams</h4>
+                      <div className="teams-container">
+                        <div className="team-section">
+                          <h5>Your Team</h5>
+                          <div className="pokemon-list">
+                            {selectedBattle.yourTeam.map((pokemon, index) => (
+                              <div key={`your-${index}`} className="pokemon-card">
+                                <img
+                                  src={pokemon.sprites?.front_default || "/placeholder.svg"}
+                                  alt={pokemon.name}
+                                />
+                                <p>{pokemon.name}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="team-section">
+                          <h5>Opponent's Team</h5>
+                          <div className="pokemon-list">
+                            {selectedBattle.opponentTeam.map((pokemon, index) => (
+                              <div key={`opponent-${index}`} className="pokemon-card">
+                                <img
+                                  src={pokemon.sprites?.front_default || "/placeholder.svg"}
+                                  alt={pokemon.name}
+                                />
+                                <p>{pokemon.name}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  ))}
+                  )}
+                  <button className="pokedex-button close-button" onClick={() => setSelectedBattle(null)}>
+                    Close Details
+                  </button>
                 </div>
-                <div className="detail-section">
-                  <h4>Total Wins</h4>
-                  <p>Your Pokémon: {selectedBattle.totalWins.player}</p>
-                  <p>Opponent: {selectedBattle.totalWins.opponent}</p>
-                </div>
-                <button className="pokedex-button" onClick={() => setSelectedBattle(null)}>
-                  Close Details
-                </button>
-              </div>
+              </>
             )}
           </div>
         )}

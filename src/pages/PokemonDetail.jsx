@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import axios from "axios"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const PokemonDetail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -31,7 +33,7 @@ const PokemonDetail = () => {
   const addToTeam = async () => {
     try {
       // Check if team exists
-      const response = await axios.get("http://localhost:3001/teams")
+      const response = await axios.get(`${API_BASE_URL}/teams`)
       const currentTeam = response.data || []
 
       // Check if team is full
@@ -46,10 +48,16 @@ const PokemonDetail = () => {
         return
       }
 
-      // Add Pokémon to team
-      await axios.post("http://localhost:3001/teams", {
-        ...pokemon,
-        teamId: Date.now(), // Add unique ID for team management
+      // Add Pokémon to team with all necessary data
+      await axios.post(`${API_BASE_URL}/teams`, {
+        id: pokemon.id,
+        name: pokemon.name,
+        sprites: pokemon.sprites,
+        types: pokemon.types,
+        stats: pokemon.stats,
+        abilities: pokemon.abilities,
+        moves: pokemon.moves,
+        createdAt: new Date().toISOString()
       })
 
       // Show success message
@@ -57,7 +65,10 @@ const PokemonDetail = () => {
       successMessage.className = "success-message"
       successMessage.textContent = `${pokemon.name} added to your team!`
       document.body.appendChild(successMessage)
-      setTimeout(() => successMessage.remove(), 3000)
+      setTimeout(() => {
+        successMessage.remove()
+        navigate("/team")
+      }, 2000)
 
       // Clear any previous errors
       setError(null)

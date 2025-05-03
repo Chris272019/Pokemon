@@ -1,10 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Link as RouterLink } from "react-router-dom"
+import { Link as RouterLink, useNavigate } from "react-router-dom"
 import axios from "axios"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const Team = () => {
+  const navigate = useNavigate()
   const [team, setTeam] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -13,7 +16,6 @@ const Team = () => {
   const [showDeckModal, setShowDeckModal] = useState(false)
   const [newDeckName, setNewDeckName] = useState("")
   const [newDeckElement, setNewDeckElement] = useState("")
-  const [pokemonToRemove, setPokemonToRemove] = useState(null)
   const [showRemoveAllModal, setShowRemoveAllModal] = useState(false)
 
   const formatDate = (dateString) => {
@@ -32,10 +34,11 @@ const Team = () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.get("http://localhost:3001/teams")
+      const response = await axios.get(`${API_BASE_URL}/teams`)
       setTeam(response.data)
     } catch (error) {
-      setError("Failed to fetch your team. Please try again later.")
+      console.error("Error removing Pokémon:", error)
+      setError(error.response?.data?.message || error.message || "Failed to remove Pokémon. Please try again.")
     } finally {
       setLoading(false)
     }
@@ -43,7 +46,7 @@ const Team = () => {
 
   const fetchEmptyDecks = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/decks")
+      const response = await axios.get(`${API_BASE_URL}/decks`)
       const empty = response.data.filter((deck) => deck.pokemon.length === 0)
       setEmptyDecks(empty)
     } catch (error) {
@@ -53,37 +56,36 @@ const Team = () => {
 
   const removeFromTeam = async (pokemonId) => {
     try {
-      setError(null) // Clear error state when starting removal process
+      const confirmed = window.confirm("Are you sure you want to remove this Pokémon from your team?")
+      if (!confirmed) {
+        return
+      }
+      setError(null)
       const pokemonToRemove = team.find((p) => p.id === pokemonId)
       if (!pokemonToRemove) {
         return
       }
-
-      setPokemonToRemove(pokemonToRemove)
+      await confirmRemove(pokemonToRemove.id)
     } catch (error) {
-      console.error("Error preparing to remove Pokémon:", error)
-      setError("Failed to prepare removal. Please try again.")
+      console.error("Error removing Pokémon:", error)
+      setError(error.response?.data?.message || error.message || "Failed to remove Pokémon. Please try again.")
     }
   }
 
-  const confirmRemove = async () => {
+  const confirmRemove = async (id) => {
     try {
       setError(null)
-      await axios.delete(`http://localhost:3001/teams/${pokemonToRemove.id}`)
-
-      // Update the team state immediately instead of forcing a page refresh
-      setTeam(prevTeam => prevTeam.filter(p => p.id !== pokemonToRemove.id))
-      setPokemonToRemove(null)
+      await axios.delete(`${API_BASE_URL}/teams/${id}`)
+      await fetchTeam()
     } catch (error) {
       console.error("Error removing Pokémon:", error)
-      setError("Failed to remove Pokémon. Please try again.")
-      setPokemonToRemove(null)
+      setError(error.response?.data?.message || error.message || "Failed to remove Pokémon. Please try again.")
     }
   }
 
   const storeTeamInDeck = async (deckId) => {
     try {
-      const deckResponse = await axios.get(`http://localhost:3001/decks/${deckId}`)
+      const deckResponse = await axios.get(`${API_BASE_URL}/decks/${deckId}`)
       const deck = deckResponse.data
 
       if (deck.pokemon.length > 0) {
@@ -91,8 +93,7 @@ const Team = () => {
         return
       }
 
-      // Store the team in the deck
-      await axios.patch(`http://localhost:3001/decks/${deckId}`, {
+      await axios.patch(`${API_BASE_URL}/decks/${deckId}`, {
         pokemon: team.map((p) => ({
           id: p.id,
           name: p.name,
@@ -101,16 +102,13 @@ const Team = () => {
         })),
       })
 
-      // Remove each Pokémon from the team
       for (const pokemon of team) {
-        await axios.delete(`http://localhost:3001/teams/${pokemon.teamId}`)
+        await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
       }
 
-      // Update the UI immediately
       setTeam([])
       setEmptyDecks(prev => prev.filter(d => d.id !== deckId))
 
-      // Show success message
       const successMessage = document.createElement("div")
       successMessage.className = "success-message"
       successMessage.textContent = `Team stored in ${deck.name}!`
@@ -118,7 +116,7 @@ const Team = () => {
 
       setTimeout(() => {
         successMessage.remove()
-        window.location.reload()
+        navigate("/decks")
       }, 2000)
     } catch (error) {
       console.error("Error storing team in deck:", error)
@@ -131,11 +129,11 @@ const Team = () => {
   }
 
   const getStatColor = (statValue) => {
-    if (statValue >= 100) return "#4CAF50" // Green for high stats
-    if (statValue >= 75) return "#8BC34A" // Light green for good stats
-    if (statValue >= 50) return "#FFC107" // Yellow for average stats
-    if (statValue >= 25) return "#FF9800" // Orange for below average stats
-    return "#F44336" // Red for low stats
+    if (statValue >= 100) return "#4CAF50"
+    if (statValue >= 75) return "#8BC34A"
+    if (statValue >= 50) return "#FFC107"
+    if (statValue >= 25) return "#FF9800"
+    return "#F44336"
   }
 
   const formatStatName = (statName) => {
@@ -156,13 +154,12 @@ const Team = () => {
         return
       }
 
-      const response = await axios.post("http://localhost:3001/decks", {
+      const response = await axios.post(`${API_BASE_URL}/decks`, {
         name: newDeckName,
         element: newDeckElement,
         pokemon: [],
       })
 
-      // Store the team in the newly created deck
       await storeTeamInDeck(response.data.id)
       setShowDeckModal(false)
       setNewDeckName("")
@@ -176,12 +173,10 @@ const Team = () => {
   const removeAllPokemon = async () => {
     try {
       setError(null)
-      // Delete all Pokémon from the team
       for (const pokemon of team) {
-        await axios.delete(`http://localhost:3001/teams/${pokemon.id}`)
+        await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
       }
-      // Clear the team state
-      setTeam([])
+      await fetchTeam()
       setShowRemoveAllModal(false)
     } catch (error) {
       console.error("Error removing all Pokémon:", error)
@@ -231,6 +226,11 @@ const Team = () => {
           </div>
         ) : (
           <>
+          {error && (
+            <div className="error-message" style={{ color: "red", marginBottom: "1rem" }}>
+              {error}
+            </div>
+          )}
             <div className="team-grid">
               {team.map((pokemon) => (
                 <div
@@ -344,43 +344,6 @@ const Team = () => {
                         setNewDeckElement("")
                       }}
                     >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {pokemonToRemove && (
-              <div className="modal-overlay">
-                <div className="modal-content">
-                  <h3>Remove Pokémon</h3>
-                  <p>Are you sure you want to remove {pokemonToRemove.name} from your team?</p>
-                  <div className="pokemon-preview">
-                    <img
-                      src={pokemonToRemove.sprites.front_default || "/placeholder.svg"}
-                      alt={pokemonToRemove.name}
-                      className="pokemon-image"
-                    />
-                    <div className="pokemon-types">
-                      {pokemonToRemove.types.map((type) => (
-                        <span
-                          key={type.type.name}
-                          className="pokemon-type"
-                          style={{
-                            backgroundColor: getTypeColor(type.type.name),
-                          }}
-                        >
-                          {type.type.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="modal-buttons">
-                    <button className="pokedex-button confirm-button" onClick={confirmRemove}>
-                      Yes, Remove
-                    </button>
-                    <button className="pokedex-button cancel-button" onClick={() => setPokemonToRemove(null)}>
                       Cancel
                     </button>
                   </div>
