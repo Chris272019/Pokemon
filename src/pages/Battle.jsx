@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+
 const Battle = () => {
   const [yourTeam, setYourTeam] = useState([])
   const [opponentTeam, setOpponentTeam] = useState([])
@@ -25,7 +27,7 @@ const Battle = () => {
 
   const fetchDecks = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/decks")
+      const response = await axios.get(`${API_BASE_URL}/decks`)
       console.log("Fetched decks:", response.data) // Debug log
       setDecks(response.data)
     } catch (error) {
@@ -43,7 +45,7 @@ const Battle = () => {
         team = deck.pokemon
       } else {
         // Otherwise fetch the pokemon data
-        const response = await axios.get(`http://localhost:3001/decks/${deck.id}`)
+        const response = await axios.get(`${API_BASE_URL}/decks/${deck.id}`)
         team = response.data.pokemon || []
       }
 

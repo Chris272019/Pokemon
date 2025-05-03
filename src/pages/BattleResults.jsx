@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { Link as RouterLink } from "react-router-dom"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+
 const BattleResults = () => {
   const [battles, setBattles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,7 +22,7 @@ const BattleResults = () => {
       setError(null)
       console.log("Fetching battle results...")
 
-      const response = await axios.get("http://localhost:3001/battles")
+      const response = await axios.get(`${API_BASE_URL}/battles`)
       console.log("Server response:", response.data)
 
       if (!response.data) {

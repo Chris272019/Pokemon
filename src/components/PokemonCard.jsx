@@ -4,7 +4,7 @@ import { useState } from "react"
 import axios from "axios"
 import { Link, useNavigate } from "react-router-dom"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3004';
 
 const PokemonCard = ({ pokemon }) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -19,8 +19,12 @@ const PokemonCard = ({ pokemon }) => {
       setIsLoading(true)
       setError(null)
 
+      console.log("Attempting to add Pokémon to team:", pokemon)
+
       // Check if team is full
       const teamResponse = await axios.get(`${API_BASE_URL}/teams`)
+      console.log("Current team:", teamResponse.data)
+      
       if (teamResponse.data.length >= 6) {
         // Check for empty decks
         const decksResponse = await axios.get(`${API_BASE_URL}/decks`)
@@ -39,23 +43,43 @@ const PokemonCard = ({ pokemon }) => {
       }
 
       // Check if Pokémon is already in team
-      const isInTeam = teamResponse.data.some((p) => p.id === pokemon.id)
+      const isInTeam = teamResponse.data.some((p) => p.pokemonId === pokemon.id)
       if (isInTeam) {
         setError("This Pokémon is already in your team!")
         return
       }
 
-      // Add to team with all necessary data
-      await axios.post(`${API_BASE_URL}/teams`, {
-        id: pokemon.id,
+      const pokemonData = {
+        pokemonId: pokemon.id,
         name: pokemon.name,
-        sprites: pokemon.sprites,
-        types: pokemon.types,
-        stats: pokemon.stats,
-        abilities: pokemon.abilities,
-        moves: pokemon.moves,
-        createdAt: new Date().toISOString()
+        sprites: {
+          front_default: pokemon.sprites.front_default
+        },
+        types: pokemon.types.map(type => ({
+          type: {
+            name: type.type.name
+          }
+        })),
+        stats: pokemon.stats.map(stat => ({
+          stat: { name: stat.stat.name },
+          base_stat: stat.base_stat
+        }))
+      }
+
+      console.log("Sending Pokémon data to server:", pokemonData)
+
+      // Add to team with all necessary data
+      const response = await axios.post(`${API_BASE_URL}/teams`, pokemonData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
       })
+      
+      console.log("Server response:", response.data)
+
+      if (!response.data) {
+        throw new Error('No response data received from server')
+      }
 
       // Show success message
       const successMessage = document.createElement("div")
@@ -68,8 +92,14 @@ const PokemonCard = ({ pokemon }) => {
         window.location.reload()
       }, 1000)
     } catch (error) {
-      console.error("Error adding to team:", error)
-      setError("Failed to add Pokémon to team. Please try again.")
+      console.error("Detailed error:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers,
+        config: error.config
+      })
+      setError(error.response?.data?.message || error.message || "Failed to add Pokémon to team. Please try again.")
     } finally {
       setIsLoading(false)
     }

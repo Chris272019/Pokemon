@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import AddDeckButton from "../components/AddDeckButton"
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+
 const Decks = () => {
   const [decks, setDecks] = useState([])
   const [loading, setLoading] = useState(true)
@@ -20,7 +22,7 @@ const Decks = () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.get("http://localhost:3001/decks")
+      const response = await axios.get(`${API_BASE_URL}/decks`)
       setDecks(response.data)
     } catch (error) {
       setError("Failed to fetch decks. Please try again later.")
@@ -36,7 +38,7 @@ const Decks = () => {
 
   const deleteDeck = async (deckId) => {
     try {
-      await axios.delete(`http://localhost:3001/decks/${deckId}`)
+      await axios.delete(`${API_BASE_URL}/decks/${deckId}`)
       setDecks(decks.filter((deck) => deck.id !== deckId))
       setShowDeleteModal(false)
       setDeckToDelete(null)
@@ -54,7 +56,7 @@ const Decks = () => {
   const loadDeckToTeam = async (deck) => {
     try {
       // Check if team is empty
-      const teamResponse = await axios.get("http://localhost:3001/teams")
+      const teamResponse = await axios.get(`${API_BASE_URL}/teams`)
       if (teamResponse.data.length > 0) {
         if (!window.confirm("Loading this deck will replace your current team. Continue?")) {
           return
@@ -62,13 +64,13 @@ const Decks = () => {
 
         // Clear current team
         for (const pokemon of teamResponse.data) {
-          await axios.delete(`http://localhost:3001/teams/${pokemon.id}`)
+          await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
         }
       }
 
       // Add deck Pokémon to team
       for (const pokemon of deck.pokemon) {
-        await axios.post("http://localhost:3001/teams", {
+        await axios.post(`${API_BASE_URL}/teams`, {
           ...pokemon,
           teamId: Date.now() + Math.random(), // Ensure unique ID
         })
