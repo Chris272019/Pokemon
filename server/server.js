@@ -9,7 +9,13 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173', 'http://127.0.0.1:3000'],
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    'https://your-netlify-app.netlify.app' // Replace with your Netlify URL
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   credentials: true
 }));
@@ -18,7 +24,30 @@ app.use(express.json());
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// API Routes
+// Initialize empty arrays if they don't exist in db.json
+const initializeDB = () => {
+  const dbPath = path.join(__dirname, '../db.json');
+  let db = { teams: [], battles: [], favorites: [], decks: [] };
+  
+  try {
+    if (fs.existsSync(dbPath)) {
+      db = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+    }
+    // Ensure all required collections exist
+    db.teams = db.teams || [];
+    db.battles = db.battles || [];
+    db.favorites = db.favorites || [];
+    db.decks = db.decks || [];
+    fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+  } catch (error) {
+    console.error('Error initializing database:', error);
+  }
+};
+
+// Initialize database on server start
+initializeDB();
+
+// Teams endpoints
 app.get('/teams', (req, res) => {
   const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
   res.json(db.teams || []);
@@ -40,6 +69,37 @@ app.delete('/teams/:id', (req, res) => {
   res.json({ message: 'Team deleted successfully' });
 });
 
+// Battles endpoints
+app.get('/battles', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  res.json(db.battles || []);
+});
+
+app.post('/battles', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  const newBattle = { ...req.body, id: Date.now().toString() };
+  db.battles = db.battles || [];
+  db.battles.push(newBattle);
+  fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
+  res.json(newBattle);
+});
+
+// Favorites endpoints
+app.get('/favorites', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  res.json(db.favorites || []);
+});
+
+app.post('/favorites', (req, res) => {
+  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
+  const newFavorite = { ...req.body, id: Date.now().toString() };
+  db.favorites = db.favorites || [];
+  db.favorites.push(newFavorite);
+  fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
+  res.json(newFavorite);
+});
+
+// Decks endpoints
 app.get('/decks', (req, res) => {
   const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
   res.json(db.decks || []);
@@ -54,55 +114,11 @@ app.post('/decks', (req, res) => {
   res.json(newDeck);
 });
 
-app.get('/decks/:id', (req, res) => {
-  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
-  const deck = db.decks.find(d => d.id === req.params.id);
-  if (deck) {
-    res.json(deck);
-  } else {
-    res.status(404).json({ message: 'Deck not found' });
-  }
-});
-
-app.patch('/decks/:id', (req, res) => {
-  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
-  const deckIndex = db.decks.findIndex(d => d.id === req.params.id);
-  if (deckIndex !== -1) {
-    db.decks[deckIndex] = { ...db.decks[deckIndex], ...req.body };
-    fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-    res.json(db.decks[deckIndex]);
-  } else {
-    res.status(404).json({ message: 'Deck not found' });
-  }
-});
-
 app.delete('/decks/:id', (req, res) => {
   const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
   db.decks = db.decks.filter(deck => deck.id !== req.params.id);
   fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
   res.json({ message: 'Deck deleted successfully' });
-});
-
-// Pokemon Routes
-app.get('/pokemon', (req, res) => {
-  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
-  res.json(db.pokemon || []);
-});
-
-app.post('/pokemon', (req, res) => {
-  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
-  const newPokemon = { ...req.body, id: Date.now().toString() };
-  db.pokemon = db.pokemon || [];
-  db.pokemon.push(newPokemon);
-  fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-  res.json(newPokemon);
-});
-
-app.delete('/pokemon/:id', (req, res) => {
-  const db = JSON.parse(fs.readFileSync(path.join(__dirname, '../db.json'), 'utf8'));
-  db.pokemon = db.pokemon.filter(pokemon => pokemon.id !== req.params.id);
-  fs.writeFileSync(path.join(__dirname, '../db.json'), JSON.stringify(db, null, 2));
-  res.json({ message: 'Pokemon deleted successfully' });
 });
 
 // Start server
