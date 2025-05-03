@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import axios from "axios"
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const Team = () => {
   const navigate = useNavigate()
