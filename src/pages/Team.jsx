@@ -4,6 +4,8 @@ import { useState, useEffect } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import axios from "axios"
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
 const Team = () => {
   const navigate = useNavigate()
   const [team, setTeam] = useState([])
@@ -32,7 +34,7 @@ const Team = () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.get("http://localhost:3001/teams")
+      const response = await axios.get(`${API_BASE_URL}/teams`)
       setTeam(response.data)
     } catch (error) {
       console.error("Error removing Pokémon:", error)
@@ -44,7 +46,7 @@ const Team = () => {
 
   const fetchEmptyDecks = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/decks")
+      const response = await axios.get(`${API_BASE_URL}/decks`)
       const empty = response.data.filter((deck) => deck.pokemon.length === 0)
       setEmptyDecks(empty)
     } catch (error) {
@@ -73,7 +75,7 @@ const Team = () => {
   const confirmRemove = async (id) => {
     try {
       setError(null)
-      await axios.delete(`http://localhost:3001/teams/${id}`)
+      await axios.delete(`${API_BASE_URL}/teams/${id}`)
       await fetchTeam()
     } catch (error) {
       console.error("Error removing Pokémon:", error)
@@ -83,7 +85,7 @@ const Team = () => {
 
   const storeTeamInDeck = async (deckId) => {
     try {
-      const deckResponse = await axios.get(`http://localhost:3001/decks/${deckId}`)
+      const deckResponse = await axios.get(`${API_BASE_URL}/decks/${deckId}`)
       const deck = deckResponse.data
 
       if (deck.pokemon.length > 0) {
@@ -91,7 +93,7 @@ const Team = () => {
         return
       }
 
-      await axios.patch(`http://localhost:3001/decks/${deckId}`, {
+      await axios.patch(`${API_BASE_URL}/decks/${deckId}`, {
         pokemon: team.map((p) => ({
           id: p.id,
           name: p.name,
@@ -101,7 +103,7 @@ const Team = () => {
       })
 
       for (const pokemon of team) {
-        await axios.delete(`http://localhost:3001/teams/${pokemon.id}`)
+        await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
       }
 
       setTeam([])
@@ -152,7 +154,7 @@ const Team = () => {
         return
       }
 
-      const response = await axios.post("http://localhost:3001/decks", {
+      const response = await axios.post(`${API_BASE_URL}/decks`, {
         name: newDeckName,
         element: newDeckElement,
         pokemon: [],
@@ -172,7 +174,7 @@ const Team = () => {
     try {
       setError(null)
       for (const pokemon of team) {
-        await axios.delete(`http://localhost:3001/teams/${pokemon.id}`)
+        await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
       }
       await fetchTeam()
       setShowRemoveAllModal(false)
