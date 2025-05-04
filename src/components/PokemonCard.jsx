@@ -50,7 +50,7 @@ const PokemonCard = ({ pokemon }) => {
       }
 
       const pokemonData = {
-        pokemonId: pokemon.id,
+        id: pokemon.id,
         name: pokemon.name,
         sprites: {
           front_default: pokemon.sprites.front_default
@@ -72,7 +72,8 @@ const PokemonCard = ({ pokemon }) => {
       const response = await axios.post(`${API_BASE_URL}/teams`, pokemonData, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        withCredentials: false
       })
       
       console.log("Server response:", response.data)
@@ -97,7 +98,8 @@ const PokemonCard = ({ pokemon }) => {
         response: error.response?.data,
         status: error.response?.status,
         headers: error.response?.headers,
-        config: error.config
+        config: error.config,
+        url: `${API_BASE_URL}/teams`
       })
       setError(error.response?.data?.message || error.message || "Failed to add Pokémon to team. Please try again.")
     } finally {

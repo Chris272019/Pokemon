@@ -3,6 +3,7 @@
 import { Link } from "react-router-dom"
 import { useState, useEffect } from "react"
 import axios from "axios"
+import LoadingSpinner from "../components/LoadingSpinner"
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
 
@@ -13,10 +14,12 @@ const Home = () => {
   const [userName, setUserName] = useState("")
   const [error, setError] = useState("")
   const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        setIsLoading(true)
         const [teamRes, battleRes, deckRes] = await Promise.all([
           axios.get(`${API_BASE_URL}/teams`),
           axios.get(`${API_BASE_URL}/battles`),
@@ -28,11 +31,18 @@ const Home = () => {
         setDeckCount(deckRes.data.length)
       } catch (error) {
         console.error("Error fetching stats:", error)
+        setError("Failed to load data. Please try again.")
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchStats()
   }, [])
+
+  if (isLoading) {
+    return <LoadingSpinner message="Loading your Pokémon data..." />
+  }
 
   const handleNameSubmit = async (e) => {
     e.preventDefault()
