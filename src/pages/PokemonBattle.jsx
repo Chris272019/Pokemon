@@ -270,7 +270,7 @@ const PokemonBattle = () => {
         },
       }
 
-      await axios.post(`${API_BASE_URL}/battles`, battleData)
+      await axios.post(`${API_BASE_URL}/api/battles`, battleData)
       console.log("Battle result saved successfully")
     } catch (error) {
       console.error("Error saving battle result:", error)

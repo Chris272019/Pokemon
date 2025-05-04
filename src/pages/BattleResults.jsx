@@ -22,7 +22,7 @@ const BattleResults = () => {
       setError(null)
       console.log("Fetching battle results...")
 
-      const response = await axios.get(`${API_BASE_URL}/battles`)
+      const response = await axios.get(`${API_BASE_URL}/api/battles`)
       console.log("Server response:", response.data)
 
       if (!response.data) {
