@@ -92,12 +92,34 @@ app.post('/api/pokemon', async (req, res) => {
 });
 
 // Teams routes
+app.get('/teams', async (req, res) => {
+  try {
+    await loadDb();
+    res.json(db.teams || []);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch teams' });
+  }
+});
+
 app.get('/api/teams', async (req, res) => {
   try {
     await loadDb();
     res.json(db.teams || []);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch teams' });
+  }
+});
+
+app.post('/teams', async (req, res) => {
+  try {
+    await loadDb();
+    const newTeam = req.body;
+    db.teams = db.teams || [];
+    db.teams.push(newTeam);
+    await saveDb();
+    res.status(201).json(newTeam);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create team' });
   }
 });
 
@@ -114,6 +136,18 @@ app.post('/api/teams', async (req, res) => {
   }
 });
 
+app.delete('/teams/:id', async (req, res) => {
+  try {
+    await loadDb();
+    const id = parseInt(req.params.id);
+    db.teams = db.teams.filter(team => team.id !== id);
+    await saveDb();
+    res.status(200).json({ message: 'Team deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete team' });
+  }
+});
+
 app.delete('/api/teams/:id', async (req, res) => {
   try {
     await loadDb();
@@ -127,12 +161,34 @@ app.delete('/api/teams/:id', async (req, res) => {
 });
 
 // Battles routes
+app.get('/battles', async (req, res) => {
+  try {
+    await loadDb();
+    res.json(db.battles || []);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch battles' });
+  }
+});
+
 app.get('/api/battles', async (req, res) => {
   try {
     await loadDb();
     res.json(db.battles || []);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch battles' });
+  }
+});
+
+app.post('/battles', async (req, res) => {
+  try {
+    await loadDb();
+    const newBattle = req.body;
+    db.battles = db.battles || [];
+    db.battles.push(newBattle);
+    await saveDb();
+    res.status(201).json(newBattle);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create battle' });
   }
 });
 
@@ -150,12 +206,35 @@ app.post('/api/battles', async (req, res) => {
 });
 
 // Decks routes
+app.get('/decks', async (req, res) => {
+  try {
+    await loadDb();
+    res.json(db.decks || []);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch decks' });
+  }
+});
+
 app.get('/api/decks', async (req, res) => {
   try {
     await loadDb();
     res.json(db.decks || []);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch decks' });
+  }
+});
+
+app.get('/decks/:id', async (req, res) => {
+  try {
+    await loadDb();
+    const deck = db.decks?.find(d => d.id === parseInt(req.params.id));
+    if (deck) {
+      res.json(deck);
+    } else {
+      res.status(404).json({ error: 'Deck not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch deck' });
   }
 });
 
@@ -173,6 +252,19 @@ app.get('/api/decks/:id', async (req, res) => {
   }
 });
 
+app.post('/decks', async (req, res) => {
+  try {
+    await loadDb();
+    const newDeck = req.body;
+    db.decks = db.decks || [];
+    db.decks.push(newDeck);
+    await saveDb();
+    res.status(201).json(newDeck);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create deck' });
+  }
+});
+
 app.post('/api/decks', async (req, res) => {
   try {
     await loadDb();
@@ -183,6 +275,22 @@ app.post('/api/decks', async (req, res) => {
     res.status(201).json(newDeck);
   } catch (error) {
     res.status(500).json({ error: 'Failed to create deck' });
+  }
+});
+
+app.patch('/decks/:id', async (req, res) => {
+  try {
+    await loadDb();
+    const id = parseInt(req.params.id);
+    const deckIndex = db.decks.findIndex(d => d.id === id);
+    if (deckIndex === -1) {
+      return res.status(404).json({ error: 'Deck not found' });
+    }
+    db.decks[deckIndex] = { ...db.decks[deckIndex], ...req.body };
+    await saveDb();
+    res.json(db.decks[deckIndex]);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update deck' });
   }
 });
 
@@ -199,6 +307,18 @@ app.patch('/api/decks/:id', async (req, res) => {
     res.json(db.decks[deckIndex]);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update deck' });
+  }
+});
+
+app.delete('/decks/:id', async (req, res) => {
+  try {
+    await loadDb();
+    const id = parseInt(req.params.id);
+    db.decks = db.decks.filter(deck => deck.id !== id);
+    await saveDb();
+    res.status(200).json({ message: 'Deck deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete deck' });
   }
 });
 
