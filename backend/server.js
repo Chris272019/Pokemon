@@ -61,9 +61,11 @@ const loadDb = async () => {
     const data = await fs.readFile(path.join(__dirname, 'db.json'), 'utf8');
     db = JSON.parse(data);
     console.log('Database loaded successfully');
+    return true;
   } catch (error) {
     console.error('Error loading database:', error);
     db = { pokemon: [], teams: [], battles: [], decks: [] };
+    return false;
   }
 };
 
@@ -77,12 +79,21 @@ const saveDb = async () => {
   }
 };
 
+// Initialize database
+(async () => {
+  await loadDb();
+})();
+
 // Health check route
 app.get('/health', (req, res) => {
   res.status(200).json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    database: {
+      initialized: Object.keys(db).length > 0,
+      collections: Object.keys(db)
+    }
   });
 });
 
@@ -255,10 +266,16 @@ io.on('connection', (socket) => {
   });
 });
 
-// Error handling middleware
+// Add error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  console.error('Error:', err);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+// Add 404 handler
+app.use((req, res) => {
+  console.log(`404 - Route not found: ${req.method} ${req.url}`);
+  res.status(404).json({ error: `Route not found: ${req.method} ${req.url}` });
 });
 
 const PORT = process.env.PORT || 3004;
