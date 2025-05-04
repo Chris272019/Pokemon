@@ -54,8 +54,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Backend
-/backend
-backend/
+# Git
 .git*
 .gitmodules
