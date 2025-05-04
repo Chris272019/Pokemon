@@ -93,34 +93,12 @@ app.post('/api/pokemon', async (req, res) => {
 });
 
 // Teams routes
-app.get('/teams', async (req, res) => {
-  try {
-    await loadDb();
-    res.json(db.teams || []);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch teams' });
-  }
-});
-
 app.get('/api/teams', async (req, res) => {
   try {
     await loadDb();
     res.json(db.teams || []);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch teams' });
-  }
-});
-
-app.post('/teams', async (req, res) => {
-  try {
-    await loadDb();
-    const newTeam = req.body;
-    db.teams = db.teams || [];
-    db.teams.push(newTeam);
-    await saveDb();
-    res.status(201).json(newTeam);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create team' });
   }
 });
 
@@ -137,18 +115,6 @@ app.post('/api/teams', async (req, res) => {
   }
 });
 
-app.delete('/teams/:id', async (req, res) => {
-  try {
-    await loadDb();
-    const id = parseInt(req.params.id);
-    db.teams = db.teams.filter(team => team.id !== id);
-    await saveDb();
-    res.status(200).json({ message: 'Team deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete team' });
-  }
-});
-
 app.delete('/api/teams/:id', async (req, res) => {
   try {
     await loadDb();
@@ -162,34 +128,12 @@ app.delete('/api/teams/:id', async (req, res) => {
 });
 
 // Battles routes
-app.get('/battles', async (req, res) => {
-  try {
-    await loadDb();
-    res.json(db.battles || []);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch battles' });
-  }
-});
-
 app.get('/api/battles', async (req, res) => {
   try {
     await loadDb();
     res.json(db.battles || []);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch battles' });
-  }
-});
-
-app.post('/battles', async (req, res) => {
-  try {
-    await loadDb();
-    const newBattle = req.body;
-    db.battles = db.battles || [];
-    db.battles.push(newBattle);
-    await saveDb();
-    res.status(201).json(newBattle);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create battle' });
   }
 });
 
@@ -207,15 +151,6 @@ app.post('/api/battles', async (req, res) => {
 });
 
 // Decks routes
-app.get('/decks', async (req, res) => {
-  try {
-    await loadDb();
-    res.json(db.decks || []);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch decks' });
-  }
-});
-
 app.get('/api/decks', async (req, res) => {
   try {
     await loadDb();
