@@ -33,7 +33,7 @@ const PokemonDetail = () => {
   const addToTeam = async () => {
     try {
       // Check if team exists
-      const response = await axios.get(`${API_BASE_URL}/teams`)
+      const response = await axios.get(`${API_BASE_URL}/api/teams`)
       const currentTeam = response.data || []
 
       // Check if team is full
@@ -49,7 +49,7 @@ const PokemonDetail = () => {
       }
 
       // Add Pokémon to team with all necessary data
-      await axios.post(`${API_BASE_URL}/teams`, {
+      await axios.post(`${API_BASE_URL}/api/teams`, {
         id: pokemon.id,
         name: pokemon.name,
         sprites: pokemon.sprites,
