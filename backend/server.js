@@ -170,8 +170,8 @@ app.post('/api/pokemon', async (req, res) => {
 });
 
 // Teams routes
-app.get('/api/teams', async (req, res) => {
-  console.log('GET /api/teams - Fetching teams');
+app.get('/teams', async (req, res) => {
+  console.log('GET /teams - Fetching teams');
   try {
     await loadDb();
     const teams = db.teams || [];
@@ -183,8 +183,8 @@ app.get('/api/teams', async (req, res) => {
   }
 });
 
-app.post('/api/teams', async (req, res) => {
-  console.log('POST /api/teams - Adding new team member');
+app.post('/teams', async (req, res) => {
+  console.log('POST /teams - Adding new team member');
   try {
     await loadDb();
     const newTeam = req.body;
@@ -200,7 +200,7 @@ app.post('/api/teams', async (req, res) => {
   }
 });
 
-app.delete('/api/teams/:id', async (req, res) => {
+app.delete('/teams/:id', async (req, res) => {
   try {
     await loadDb();
     const id = parseInt(req.params.id);
@@ -242,7 +242,7 @@ app.post('/api/battles', async (req, res) => {
 });
 
 // Decks routes
-app.get('/api/decks', async (req, res) => {
+app.get('/decks', async (req, res) => {
   try {
     await loadDb();
     res.json(db.decks || []);
@@ -252,7 +252,7 @@ app.get('/api/decks', async (req, res) => {
   }
 });
 
-app.get('/api/decks/:id', async (req, res) => {
+app.get('/decks/:id', async (req, res) => {
   try {
     await loadDb();
     const deck = db.decks?.find(d => d.id === parseInt(req.params.id));
@@ -267,7 +267,7 @@ app.get('/api/decks/:id', async (req, res) => {
   }
 });
 
-app.post('/api/decks', async (req, res) => {
+app.post('/decks', async (req, res) => {
   try {
     await loadDb();
     const newDeck = req.body;
@@ -281,7 +281,7 @@ app.post('/api/decks', async (req, res) => {
   }
 });
 
-app.patch('/api/decks/:id', async (req, res) => {
+app.patch('/decks/:id', async (req, res) => {
   try {
     await loadDb();
     const id = parseInt(req.params.id);
@@ -298,7 +298,7 @@ app.patch('/api/decks/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/decks/:id', async (req, res) => {
+app.delete('/decks/:id', async (req, res) => {
   try {
     await loadDb();
     const id = parseInt(req.params.id);
