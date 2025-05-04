@@ -1,0 +1,12 @@
+{
+  "name": "poke-battle-backend",
+  "env": "node",
+  "buildCommand": "npm install",
+  "startCommand": "npm run server",
+  "envVars": [
+    {
+      "key": "PORT",
+      "value": "3004"
+    }
+  ]
+} 
