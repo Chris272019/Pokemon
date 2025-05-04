@@ -25,7 +25,7 @@ const AddDeckButton = ({ onDeckAdded }) => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/decks`, {
+      const response = await axios.post(`${API_BASE_URL}/api/decks`, {
         name: deckName,
         element: deckElement,
         pokemon: [],

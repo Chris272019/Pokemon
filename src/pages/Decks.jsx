@@ -22,7 +22,7 @@ const Decks = () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.get(`${API_BASE_URL}/decks`)
+      const response = await axios.get(`${API_BASE_URL}/api/decks`)
       setDecks(response.data)
     } catch (error) {
       setError("Failed to fetch decks. Please try again later.")
@@ -38,7 +38,7 @@ const Decks = () => {
 
   const deleteDeck = async (deckId) => {
     try {
-      await axios.delete(`${API_BASE_URL}/decks/${deckId}`)
+      await axios.delete(`${API_BASE_URL}/api/decks/${deckId}`)
       setDecks(decks.filter((deck) => deck.id !== deckId))
       setShowDeleteModal(false)
       setDeckToDelete(null)
@@ -56,7 +56,7 @@ const Decks = () => {
   const loadDeckToTeam = async (deck) => {
     try {
       // Check if team is empty
-      const teamResponse = await axios.get(`${API_BASE_URL}/teams`)
+      const teamResponse = await axios.get(`${API_BASE_URL}/api/teams`)
       if (teamResponse.data.length > 0) {
         if (!window.confirm("Loading this deck will replace your current team. Continue?")) {
           return
@@ -64,13 +64,13 @@ const Decks = () => {
 
         // Clear current team
         for (const pokemon of teamResponse.data) {
-          await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
+          await axios.delete(`${API_BASE_URL}/api/teams/${pokemon.id}`)
         }
       }
 
       // Add deck Pokémon to team
       for (const pokemon of deck.pokemon) {
-        await axios.post(`${API_BASE_URL}/teams`, {
+        await axios.post(`${API_BASE_URL}/api/teams`, {
           ...pokemon,
           teamId: Date.now() + Math.random(), // Ensure unique ID
         })

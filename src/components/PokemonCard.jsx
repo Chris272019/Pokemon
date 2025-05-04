@@ -22,12 +22,12 @@ const PokemonCard = ({ pokemon }) => {
       console.log("Attempting to add Pokémon to team:", pokemon)
 
       // Check if team is full
-      const teamResponse = await axios.get(`${API_BASE_URL}/teams`)
+      const teamResponse = await axios.get(`${API_BASE_URL}/api/teams`)
       console.log("Current team:", teamResponse.data)
       
       if (teamResponse.data.length >= 6) {
         // Check for empty decks
-        const decksResponse = await axios.get(`${API_BASE_URL}/decks`)
+        const decksResponse = await axios.get(`${API_BASE_URL}/api/decks`)
         const emptyDecks = decksResponse.data.filter((deck) => deck.pokemon.length === 0)
 
         if (emptyDecks.length === 0) {
@@ -69,7 +69,7 @@ const PokemonCard = ({ pokemon }) => {
       console.log("Sending Pokémon data to server:", pokemonData)
 
       // Add to team with all necessary data
-      const response = await axios.post(`${API_BASE_URL}/teams`, pokemonData, {
+      const response = await axios.post(`${API_BASE_URL}/api/teams`, pokemonData, {
         headers: {
           'Content-Type': 'application/json'
         }

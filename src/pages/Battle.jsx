@@ -27,7 +27,7 @@ const Battle = () => {
 
   const fetchDecks = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/decks`)
+      const response = await axios.get(`${API_BASE_URL}/api/decks`)
       console.log("Fetched decks:", response.data) // Debug log
       setDecks(response.data)
     } catch (error) {
@@ -45,7 +45,7 @@ const Battle = () => {
         team = deck.pokemon
       } else {
         // Otherwise fetch the pokemon data
-        const response = await axios.get(`${API_BASE_URL}/decks/${deck.id}`)
+        const response = await axios.get(`${API_BASE_URL}/api/decks/${deck.id}`)
         team = response.data.pokemon || []
       }
 

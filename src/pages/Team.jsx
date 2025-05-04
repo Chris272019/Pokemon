@@ -34,7 +34,7 @@ const Team = () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await axios.get(`${API_BASE_URL}/teams`)
+      const response = await axios.get(`${API_BASE_URL}/api/teams`)
       setTeam(response.data)
     } catch (error) {
       console.error("Error removing Pokémon:", error)
@@ -46,7 +46,7 @@ const Team = () => {
 
   const fetchEmptyDecks = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/decks`)
+      const response = await axios.get(`${API_BASE_URL}/api/decks`)
       const empty = response.data.filter((deck) => deck.pokemon.length === 0)
       setEmptyDecks(empty)
     } catch (error) {
@@ -75,7 +75,7 @@ const Team = () => {
   const confirmRemove = async (id) => {
     try {
       setError(null)
-      await axios.delete(`${API_BASE_URL}/teams/${id}`)
+      await axios.delete(`${API_BASE_URL}/api/teams/${id}`)
       await fetchTeam()
     } catch (error) {
       console.error("Error removing Pokémon:", error)
@@ -85,7 +85,7 @@ const Team = () => {
 
   const storeTeamInDeck = async (deckId) => {
     try {
-      const deckResponse = await axios.get(`${API_BASE_URL}/decks/${deckId}`)
+      const deckResponse = await axios.get(`${API_BASE_URL}/api/decks/${deckId}`)
       const deck = deckResponse.data
 
       if (deck.pokemon.length > 0) {
@@ -93,7 +93,7 @@ const Team = () => {
         return
       }
 
-      await axios.patch(`${API_BASE_URL}/decks/${deckId}`, {
+      await axios.patch(`${API_BASE_URL}/api/decks/${deckId}`, {
         pokemon: team.map((p) => ({
           id: p.id,
           name: p.name,
@@ -103,7 +103,7 @@ const Team = () => {
       })
 
       for (const pokemon of team) {
-        await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
+        await axios.delete(`${API_BASE_URL}/api/teams/${pokemon.id}`)
       }
 
       setTeam([])
@@ -154,7 +154,7 @@ const Team = () => {
         return
       }
 
-      const response = await axios.post(`${API_BASE_URL}/decks`, {
+      const response = await axios.post(`${API_BASE_URL}/api/decks`, {
         name: newDeckName,
         element: newDeckElement,
         pokemon: [],
@@ -174,7 +174,7 @@ const Team = () => {
     try {
       setError(null)
       for (const pokemon of team) {
-        await axios.delete(`${API_BASE_URL}/teams/${pokemon.id}`)
+        await axios.delete(`${API_BASE_URL}/api/teams/${pokemon.id}`)
       }
       await fetchTeam()
       setShowRemoveAllModal(false)
@@ -182,6 +182,51 @@ const Team = () => {
       console.error("Error removing all Pokémon:", error)
       setError("Failed to remove all Pokémon. Please try again.")
       setShowRemoveAllModal(false)
+    }
+  }
+
+  const handleResetAllData = async () => {
+    try {
+      // First, get all the data
+      const [teams, battles, decks] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/teams`),
+        axios.get(`${API_BASE_URL}/api/battles`),
+        axios.get(`${API_BASE_URL}/api/decks`)
+      ]);
+
+      // Delete in sequence to avoid potential foreign key conflicts
+      // First delete battles as they might reference teams or decks
+      if (battles.data.length > 0) {
+        await Promise.all(
+          battles.data.map(battle => 
+            axios.delete(`${API_BASE_URL}/api/battles/${battle.id}`)
+            .catch(err => console.error(`Failed to delete battle ${battle.id}:`, err))
+          )
+        );
+      }
+
+      // Then delete teams
+      if (teams.data.length > 0) {
+        await Promise.all(
+          teams.data.map(team => 
+            axios.delete(`${API_BASE_URL}/api/teams/${team.id}`)
+            .catch(err => console.error(`Failed to delete team ${team.id}:`, err))
+          )
+        );
+      }
+
+      // Finally delete decks
+      if (decks.data.length > 0) {
+        await Promise.all(
+          decks.data.map(deck => 
+            axios.delete(`${API_BASE_URL}/api/decks/${deck.id}`)
+            .catch(err => console.error(`Failed to delete deck ${deck.id}:`, err))
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error resetting all data:", error)
+      setError("Failed to reset all data. Please try again.")
     }
   }
 
