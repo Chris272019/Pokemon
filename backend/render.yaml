@@ -6,10 +6,11 @@ services:
       npm install
       npm install json-server
       npm install express cors socket.io
-    startCommand: node backend/server.js
+    startCommand: node server.js
+    workingDirectory: backend
     envVars:
       - key: PORT
         value: 3004
       - key: NODE_ENV
         value: production
-    healthCheckPath: /health 
+    healthCheckPath: /health
