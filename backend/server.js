@@ -55,16 +55,27 @@ app.use((req, res, next) => {
 });
 
 // Load data from db.json
-let db = {};
+let db = {
+  pokemon: [],
+  teams: [],
+  battles: [],
+  decks: []
+};
+
 const loadDb = async () => {
   try {
     const data = await fs.readFile(path.join(__dirname, 'db.json'), 'utf8');
-    db = JSON.parse(data);
-    console.log('Database loaded successfully');
+    const parsedData = JSON.parse(data);
+    db = {
+      ...db,
+      ...parsedData
+    };
+    console.log('Database loaded successfully:', Object.keys(db));
     return true;
   } catch (error) {
     console.error('Error loading database:', error);
-    db = { pokemon: [], teams: [], battles: [], decks: [] };
+    // Initialize with empty collections if file doesn't exist
+    await saveDb();
     return false;
   }
 };
@@ -72,6 +83,7 @@ const loadDb = async () => {
 const saveDb = async () => {
   try {
     await fs.writeFile(path.join(__dirname, 'db.json'), JSON.stringify(db, null, 2));
+    console.log('Database saved successfully');
     return true;
   } catch (error) {
     console.error('Error saving database:', error);
@@ -81,19 +93,26 @@ const saveDb = async () => {
 
 // Initialize database
 (async () => {
+  console.log('Initializing database...');
   await loadDb();
+  console.log('Database initialized with collections:', Object.keys(db));
 })();
 
 // Health check route
 app.get('/health', (req, res) => {
+  const dbStatus = {
+    initialized: Object.keys(db).length > 0,
+    collections: Object.keys(db),
+    counts: Object.fromEntries(
+      Object.entries(db).map(([key, value]) => [key, Array.isArray(value) ? value.length : 0])
+    )
+  };
+
   res.status(200).json({ 
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    database: {
-      initialized: Object.keys(db).length > 0,
-      collections: Object.keys(db)
-    }
+    database: dbStatus
   });
 });
 
@@ -136,23 +155,31 @@ app.post('/api/pokemon', async (req, res) => {
 
 // Teams routes
 app.get('/api/teams', async (req, res) => {
+  console.log('GET /api/teams - Fetching teams');
   try {
     await loadDb();
-    res.json(db.teams || []);
+    const teams = db.teams || [];
+    console.log(`Found ${teams.length} teams`);
+    res.json(teams);
   } catch (error) {
+    console.error('Error fetching teams:', error);
     res.status(500).json({ error: 'Failed to fetch teams' });
   }
 });
 
 app.post('/api/teams', async (req, res) => {
+  console.log('POST /api/teams - Adding new team member');
   try {
     await loadDb();
     const newTeam = req.body;
+    console.log('New team member:', newTeam);
     db.teams = db.teams || [];
     db.teams.push(newTeam);
     await saveDb();
+    console.log('Team member added successfully');
     res.status(201).json(newTeam);
   } catch (error) {
+    console.error('Error creating team:', error);
     res.status(500).json({ error: 'Failed to create team' });
   }
 });
@@ -171,10 +198,14 @@ app.delete('/api/teams/:id', async (req, res) => {
 
 // Battles routes
 app.get('/api/battles', async (req, res) => {
+  console.log('GET /api/battles - Fetching battles');
   try {
     await loadDb();
-    res.json(db.battles || []);
+    const battles = db.battles || [];
+    console.log(`Found ${battles.length} battles`);
+    res.json(battles);
   } catch (error) {
+    console.error('Error fetching battles:', error);
     res.status(500).json({ error: 'Failed to fetch battles' });
   }
 });
