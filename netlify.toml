@@ -4,7 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  VITE_API_URL = "https://poke-battle-backend.onrender.com"
+  VITE_API_URL = "https://pokemon-m7s7.onrender.com"
 
 [[redirects]]
   from = "/*"
