@@ -5,7 +5,8 @@ services:
     buildCommand: |
       npm install
       npm install json-server
-    startCommand: npm start
+      npm install express cors socket.io
+    startCommand: node backend/server.js
     envVars:
       - key: PORT
         value: 3004
