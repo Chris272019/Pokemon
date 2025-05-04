@@ -49,7 +49,7 @@ const PokemonDetail = () => {
       }
 
       // Add Pokémon to team with all necessary data
-      await axios.post(`${API_BASE_URL}/api/teams`, {
+      const teamResponse = await axios.post(`${API_BASE_URL}/api/teams`, {
         id: pokemon.id,
         name: pokemon.name,
         sprites: pokemon.sprites,
@@ -59,6 +59,10 @@ const PokemonDetail = () => {
         moves: pokemon.moves,
         createdAt: new Date().toISOString()
       })
+
+      if (!teamResponse.data) {
+        throw new Error('No response data from server')
+      }
 
       // Show success message
       const successMessage = document.createElement("div")
@@ -74,7 +78,17 @@ const PokemonDetail = () => {
       setError(null)
     } catch (error) {
       console.error("Error adding to team:", error)
-      setError("Failed to add Pokémon to team. Please try again.")
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        setError(`Server error: ${error.response.data?.error || error.response.statusText}`)
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError("No response from server. Please check your internet connection.")
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        setError(`Error: ${error.message}`)
+      }
     }
   }
 

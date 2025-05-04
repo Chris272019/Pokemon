@@ -160,20 +160,6 @@ app.get('/api/decks', async (req, res) => {
   }
 });
 
-app.get('/decks/:id', async (req, res) => {
-  try {
-    await loadDb();
-    const deck = db.decks?.find(d => d.id === parseInt(req.params.id));
-    if (deck) {
-      res.json(deck);
-    } else {
-      res.status(404).json({ error: 'Deck not found' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch deck' });
-  }
-});
-
 app.get('/api/decks/:id', async (req, res) => {
   try {
     await loadDb();
@@ -185,19 +171,6 @@ app.get('/api/decks/:id', async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch deck' });
-  }
-});
-
-app.post('/decks', async (req, res) => {
-  try {
-    await loadDb();
-    const newDeck = req.body;
-    db.decks = db.decks || [];
-    db.decks.push(newDeck);
-    await saveDb();
-    res.status(201).json(newDeck);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create deck' });
   }
 });
 
@@ -214,22 +187,6 @@ app.post('/api/decks', async (req, res) => {
   }
 });
 
-app.patch('/decks/:id', async (req, res) => {
-  try {
-    await loadDb();
-    const id = parseInt(req.params.id);
-    const deckIndex = db.decks.findIndex(d => d.id === id);
-    if (deckIndex === -1) {
-      return res.status(404).json({ error: 'Deck not found' });
-    }
-    db.decks[deckIndex] = { ...db.decks[deckIndex], ...req.body };
-    await saveDb();
-    res.json(db.decks[deckIndex]);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to update deck' });
-  }
-});
-
 app.patch('/api/decks/:id', async (req, res) => {
   try {
     await loadDb();
@@ -243,18 +200,6 @@ app.patch('/api/decks/:id', async (req, res) => {
     res.json(db.decks[deckIndex]);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update deck' });
-  }
-});
-
-app.delete('/decks/:id', async (req, res) => {
-  try {
-    await loadDb();
-    const id = parseInt(req.params.id);
-    db.decks = db.decks.filter(deck => deck.id !== id);
-    await saveDb();
-    res.status(200).json({ message: 'Deck deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete deck' });
   }
 });
 
