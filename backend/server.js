@@ -67,22 +67,30 @@ const loadDb = async () => {
     const data = await fs.readFile(path.join(__dirname, 'db.json'), 'utf8');
     const parsedData = JSON.parse(data);
     db = {
-      ...db,
-      ...parsedData
+      pokemon: parsedData.pokemon || [],
+      teams: parsedData.teams || [],
+      battles: parsedData.battles || [],
+      decks: parsedData.decks || []
     };
     console.log('Database loaded successfully:', Object.keys(db));
     return true;
   } catch (error) {
+    if (error.code === 'ENOENT') {
+      console.log('No database file found, initializing with empty collections');
+      await saveDb();
+      return true;
+    }
     console.error('Error loading database:', error);
-    // Initialize with empty collections if file doesn't exist
-    await saveDb();
     return false;
   }
 };
 
 const saveDb = async () => {
   try {
-    await fs.writeFile(path.join(__dirname, 'db.json'), JSON.stringify(db, null, 2));
+    await fs.writeFile(
+      path.join(__dirname, 'db.json'),
+      JSON.stringify(db, null, 2)
+    );
     console.log('Database saved successfully');
     return true;
   } catch (error) {
@@ -116,12 +124,18 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Test route for diagnostics
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ message: 'API test route is working' });
+});
+
 // Pokemon routes
 app.get('/api/pokemon', async (req, res) => {
   try {
     await loadDb();
     res.json(db.pokemon || []);
   } catch (error) {
+    console.error('Error fetching pokemon:', error);
     res.status(500).json({ error: 'Failed to fetch pokemon' });
   }
 });
@@ -136,6 +150,7 @@ app.get('/api/pokemon/:id', async (req, res) => {
       res.status(404).json({ error: 'Pokemon not found' });
     }
   } catch (error) {
+    console.error('Error fetching pokemon:', error);
     res.status(500).json({ error: 'Failed to fetch pokemon' });
   }
 });
@@ -149,6 +164,7 @@ app.post('/api/pokemon', async (req, res) => {
     await saveDb();
     res.status(201).json(newPokemon);
   } catch (error) {
+    console.error('Error creating pokemon:', error);
     res.status(500).json({ error: 'Failed to create pokemon' });
   }
 });
@@ -192,6 +208,7 @@ app.delete('/api/teams/:id', async (req, res) => {
     await saveDb();
     res.status(200).json({ message: 'Team deleted successfully' });
   } catch (error) {
+    console.error('Error deleting team:', error);
     res.status(500).json({ error: 'Failed to delete team' });
   }
 });
@@ -219,6 +236,7 @@ app.post('/api/battles', async (req, res) => {
     await saveDb();
     res.status(201).json(newBattle);
   } catch (error) {
+    console.error('Error creating battle:', error);
     res.status(500).json({ error: 'Failed to create battle' });
   }
 });
@@ -229,6 +247,7 @@ app.get('/api/decks', async (req, res) => {
     await loadDb();
     res.json(db.decks || []);
   } catch (error) {
+    console.error('Error fetching decks:', error);
     res.status(500).json({ error: 'Failed to fetch decks' });
   }
 });
@@ -243,6 +262,7 @@ app.get('/api/decks/:id', async (req, res) => {
       res.status(404).json({ error: 'Deck not found' });
     }
   } catch (error) {
+    console.error('Error fetching deck:', error);
     res.status(500).json({ error: 'Failed to fetch deck' });
   }
 });
@@ -256,6 +276,7 @@ app.post('/api/decks', async (req, res) => {
     await saveDb();
     res.status(201).json(newDeck);
   } catch (error) {
+    console.error('Error creating deck:', error);
     res.status(500).json({ error: 'Failed to create deck' });
   }
 });
@@ -272,6 +293,7 @@ app.patch('/api/decks/:id', async (req, res) => {
     await saveDb();
     res.json(db.decks[deckIndex]);
   } catch (error) {
+    console.error('Error updating deck:', error);
     res.status(500).json({ error: 'Failed to update deck' });
   }
 });
@@ -284,6 +306,7 @@ app.delete('/api/decks/:id', async (req, res) => {
     await saveDb();
     res.status(200).json({ message: 'Deck deleted successfully' });
   } catch (error) {
+    console.error('Error deleting deck:', error);
     res.status(500).json({ error: 'Failed to delete deck' });
   }
 });

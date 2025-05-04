@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import AddDeckButton from "../components/AddDeckButton"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pokemon-backend-h8df.onrender.com';
 
 const Decks = () => {
   const [decks, setDecks] = useState([])

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Link as RouterLink, useNavigate } from "react-router-dom"
 import axios from "axios"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pokemon-backend-h8df.onrender.com';
 
 const Team = () => {
   const navigate = useNavigate()

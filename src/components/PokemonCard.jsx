@@ -4,7 +4,7 @@ import { useState } from "react"
 import axios from "axios"
 import { Link, useNavigate } from "react-router-dom"
 
-const API_BASE_URL = 'http://localhost:3004';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pokemon-backend-h8df.onrender.com';
 
 const PokemonCard = ({ pokemon }) => {
   const [isLoading, setIsLoading] = useState(false)

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import axios from "axios"
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pokemon-backend-h8df.onrender.com';
 
 const AddDeckButton = ({ onDeckAdded }) => {
   const [showModal, setShowModal] = useState(false)
