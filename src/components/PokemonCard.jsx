@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import axios from "axios"
+import React, { useState } from 'react'
+import axios from 'axios'
 import { Link, useNavigate } from "react-router-dom"
+import { useToast } from '@chakra-ui/react'
+import './PokemonCard.css'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004';
+// Use Render backend URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3004'
 
 const PokemonCard = ({ pokemon }) => {
   const [isLoading, setIsLoading] = useState(false)
@@ -19,6 +22,7 @@ const PokemonCard = ({ pokemon }) => {
       setIsLoading(true)
       setError(null)
 
+      console.log("API Base URL:", API_BASE_URL)
       console.log("Attempting to add Pokémon to team:", pokemon)
 
       // Check if team is full
@@ -43,7 +47,7 @@ const PokemonCard = ({ pokemon }) => {
       }
 
       // Check if Pokémon is already in team
-      const isInTeam = teamResponse.data.some((p) => p.pokemonId === pokemon.id)
+      const isInTeam = teamResponse.data.some((p) => p.id === pokemon.id)
       if (isInTeam) {
         setError("This Pokémon is already in your team!")
         return
@@ -72,8 +76,7 @@ const PokemonCard = ({ pokemon }) => {
       const response = await axios.post(`${API_BASE_URL}/teams`, pokemonData, {
         headers: {
           'Content-Type': 'application/json'
-        },
-        withCredentials: false
+        }
       })
       
       console.log("Server response:", response.data)
